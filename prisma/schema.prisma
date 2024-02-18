@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Comments {
+  comment_id     Int       @id @default(autoincrement())
+  job_id         Int?
+  commenter_id   Int?
+  comment_date   DateTime? @db.DateTime(0)
+  content        String?   @db.VarChar(255)
+  comment_rating Int?
+  Job            Job?      @relation(fields: [job_id], references: [job_id], onDelete: NoAction, onUpdate: NoAction, map: "Comments_ibfk_1")
+  Users          Users?    @relation(fields: [commenter_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "Comments_ibfk_2")
+
+  @@index([commenter_id], map: "commenter_id")
+  @@index([job_id], map: "job_id")
+}
+
+model HireJob {
+  hire_job_id Int       @id @default(autoincrement())
+  job_id      Int?
+  employer_id Int?
+  hire_date   DateTime? @db.DateTime(0)
+  completed   Boolean?
+  Job         Job?      @relation(fields: [job_id], references: [job_id], onDelete: NoAction, onUpdate: NoAction, map: "HireJob_ibfk_1")
+  Users       Users?    @relation(fields: [employer_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "HireJob_ibfk_2")
+
+  @@index([employer_id], map: "employer_id")
+  @@index([job_id], map: "job_id")
+}
+
+model Job {
+  job_id            Int            @id @default(autoincrement())
+  job_name          String?        @db.VarChar(255)
+  rating            Int?
+  price             Int?
+  image             String?        @db.VarChar(255)
+  description       String?        @db.VarChar(255)
+  short_description String?        @db.VarChar(200)
+  job_rating        Int?
+  detail_type_id    Int?
+  creator_id        Int?
+  Comments          Comments[]
+  HireJob           HireJob[]
+  JobDetailType     JobDetailType? @relation(fields: [detail_type_id], references: [job_detail_type_id], onDelete: NoAction, onUpdate: NoAction, map: "Job_ibfk_1")
+  Users             Users?         @relation(fields: [creator_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "Job_ibfk_2")
+
+  @@index([creator_id], map: "creator_id")
+  @@index([detail_type_id], map: "detail_type_id")
+}
+
+model JobDetailType {
+  job_detail_type_id Int      @id @default(autoincrement())
+  detail_name        String?  @db.VarChar(255)
+  image              String?  @db.VarChar(255)
+  job_type_id        Int?
+  Job                Job[]
+  JobType            JobType? @relation(fields: [job_type_id], references: [job_type_id], onDelete: NoAction, onUpdate: NoAction, map: "JobDetailType_ibfk_1")
+
+  @@index([job_type_id], map: "job_type_id")
+}
+
+model JobType {
+  job_type_id   Int             @id @default(autoincrement())
+  type_name     String?         @db.VarChar(255)
+  JobDetailType JobDetailType[]
+}
+
+model Users {
+  user_id       Int        @id @default(autoincrement())
+  user_name     String?    @db.VarChar(255)
+  avatar        String?    @db.VarChar(255)
+  email         String?    @db.VarChar(255)
+  pass_word     String?    @db.VarChar(255)
+  phone         String?    @db.VarChar(50)
+  birth_day     DateTime?  @db.Date
+  gender        String?    @db.VarChar(10)
+  role          String?    @db.VarChar(50)
+  skill         String?    @db.VarChar(255)
+  certification String?    @db.VarChar(255)
+  Comments      Comments[]
+  HireJob       HireJob[]
+  Job           Job[]
+}
