@@ -14,33 +14,36 @@ export class AuthService {
 
   // LOGIN
   async login(body: AuthLoginDTO): Promise<any> {
-    const { email, pass_word } = body;
+    try {
+      const { email, pass_word } = body;
 
-    const checkUserDB = await this.prisma.users.findFirst({
-      where: { email: email },
-    });
+      const checkUserDB = await this.prisma.users.findFirst({
+        where: { email: email },
+      });
 
-    if (checkUserDB) {
-      const isCorrectPass = bcrypt.compareSync(
-        pass_word,
-        checkUserDB.pass_word,
-      );
+      if (checkUserDB) {
+        const isCorrectPass = bcrypt.compareSync(
+          pass_word,
+          checkUserDB.pass_word,
+        );
 
-      if (isCorrectPass) {
-        const payload = {
-          user: checkUserDB.user_id,
-          email: checkUserDB.email,
-          role: checkUserDB.role,
-        };
+        if (isCorrectPass) {
+          const payload = {
+            user: checkUserDB.user_id,
+            email: checkUserDB.email,
+            role: checkUserDB.role,
+          };
 
-        const token = this.jwtService.sign(payload, {
-          secret: this.configService.get('SECRET_KEY'),
-          expiresIn: this.configService.get('EXPIRES_IN'),
-        });
-        return token;
+          const token = this.jwtService.sign(payload, {
+            secret: this.configService.get('SECRET_KEY'),
+            expiresIn: this.configService.get('EXPIRES_IN'),
+          });
+          return { status: 200, token: token };
+        }
+        return { status: 400, message: 'Incorrect password, please re-enter!' };
       }
-      return 'Incorrect password, please re-enter!';
+    } catch (error) {
+      return { status: 500, message: `User is not exist! ${error}` };
     }
-    return 'User is not exist!';
   }
 }

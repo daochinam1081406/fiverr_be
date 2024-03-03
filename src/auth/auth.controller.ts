@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthLoginDTO } from './dto/login.dto';
@@ -19,27 +20,8 @@ export class AuthController {
   // LOGIN
   @Post('/login')
   @ApiBody({ type: AuthLoginDTO })
-  login(@Body() body: AuthLoginDTO) {
-    return this.authService.login(body);
+  async login(@Body() body: AuthLoginDTO, @Res() response): Promise<any> {
+    const data = await this.authService.login(body);
+    response.status(data.status).json(data);
   }
-
-  // @Get()
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.authService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //   return this.authService.update(+id, updateAuthDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.authService.remove(+id);
-  // }
 }
