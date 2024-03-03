@@ -1,21 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import * as express from 'express';
+import { DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger/dist';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
+  app.use(express.static('.'));
+
   const config = new DocumentBuilder()
-    .setTitle('FIVERR API')
+    .setTitle('Fiverr')
     .addBearerAuth()
     .setDescription('')
     .setVersion('1.0')
     .build();
 
-  const swagger = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('/swagger', app, document);
 
-  SwaggerModule.setup('swagger', app, swagger);
-  await app.listen(3000);
+  await app.listen(8080);
 }
 bootstrap();
