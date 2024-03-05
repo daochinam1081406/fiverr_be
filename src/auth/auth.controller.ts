@@ -9,7 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthLoginDTO } from './dto/login.dto';
+import { AuthLoginDTO, AuthSignUpDTO } from './dto/login.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
@@ -22,6 +22,14 @@ export class AuthController {
   @ApiBody({ type: AuthLoginDTO })
   async login(@Body() body: AuthLoginDTO, @Res() response): Promise<any> {
     const data = await this.authService.login(body);
+    response.status(data.status).json(data);
+  }
+
+  // SIGN-UP
+  @ApiBody({ type: AuthSignUpDTO })
+  @Post('/sign-up')
+  async signUp(@Body() body: AuthSignUpDTO, @Res() response): Promise<any> {
+    const data = await this.authService.signUp(body);
     response.status(data.status).json(data);
   }
 }
