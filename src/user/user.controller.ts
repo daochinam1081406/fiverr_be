@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseInterceptors,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 
@@ -14,11 +15,36 @@ import { UserService } from './user.service';
 // import { diskStorage } from 'multer';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('user')
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get()
+  async getUser(): Promise<any> {
+    return this.userService.getUser();
+  }
+
+  @Post('')
+  async postUser() {}
+
+  @Delete('')
+  async deleteUser() {}
+
+  @Get('/pagination-search-user')
+  async paginationSearchUser() {}
+
+  @Get('/:id')
+  async getUserById() {}
+
+  @Put('/:id')
+  async putUser() {}
+
+  @Get('/search/:user_name')
+  async getSearchUserByName() {}
+
+  @Post('/upload-avatar')
+  async uploadAvatar() {}
   // @Post('/upload')
   // @UseInterceptors(
   //   FileInterceptor('file', {

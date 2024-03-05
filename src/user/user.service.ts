@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Delete, Get, Injectable, Post, Put } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  private prisma = new PrismaClient();
+
+  constructor() {
+    this.prisma = new PrismaClient();
   }
 
-  findAll() {
-    return `This action returns all user`;
+  @Get()
+  async getUser(): Promise<any> {
+    const data = await this.prisma.users.findMany();
+    return data;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  @ApiBody({})
+  @Post()
+  async postUser(): Promise<any> {}
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+  @ApiQuery({})
+  @Delete('')
+  async deleteUser() {}
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  @ApiQuery({})
+  @ApiQuery({})
+  @ApiQuery({})
+  @Get()
+  async paginationSearchUser() {}
+
+  @Get()
+  async getUserById() {}
+
+  @Put()
+  async putUser() {}
+
+  @Get()
+  async getSearchUserByName() {}
+
+  @Post()
+  async uploadAvatar() {}
 }
