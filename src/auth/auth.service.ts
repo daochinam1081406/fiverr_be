@@ -10,7 +10,7 @@ export class AuthService {
   private jwtService: JwtService;
   private configService: ConfigService;
 
-  private prisma = new PrismaClient();
+  prisma = new PrismaClient();
 
   constructor() {
     this.prisma = new PrismaClient();
@@ -82,9 +82,11 @@ export class AuthService {
           birth_day,
           gender,
           role,
-          skill,
-          certification,
+          skill: skill || [],
+          certification: certification || [],
         };
+        console.log(newUser);
+
         // await this.prisma.users.create({ data: newUser });
         return { status: 201, message: 'User signed up successfully!' };
       }

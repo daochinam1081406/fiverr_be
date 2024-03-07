@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PostUser {
+export class PostUserDTO {
+  // @ApiProperty({
+  //   description: 'id',
+  //   type: Number,
+  // })
+  // user_id: number;
+
   @ApiProperty({
     description: 'user_name',
     type: String,
@@ -51,13 +57,21 @@ export class PostUser {
 
   @ApiProperty({
     description: 'skill',
-    type: String,
+    type: [String],
   })
-  skill: string;
+  skill: string[];
 
   @ApiProperty({
     description: 'certification',
-    type: String,
+    type: [String],
   })
-  certification: string;
+  certification: string[];
+}
+
+export class DeleteUserDTO {
+  @ApiProperty({
+    description: 'user_id',
+    type: Number,
+  })
+  user_id: number;
 }

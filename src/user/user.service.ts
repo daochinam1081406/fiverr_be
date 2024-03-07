@@ -1,5 +1,5 @@
 import { Delete, Get, Injectable, Post, Put } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -7,6 +7,8 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { DeleteUserDTO, PostUserDTO } from './dto/user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -24,15 +26,89 @@ export class UserService {
 
   @ApiBody({})
   @Post()
-  async postUser(): Promise<any> {}
+  async postUser(body: PostUserDTO): Promise<any> {
+    try {
+      const {
+        user_name,
+        avatar,
+        email,
+        pass_word,
+        phone,
+        birth_day,
+        gender,
+        role,
+        skill,
+        certification,
+      } = body;
+      const checkUserDB = await this.prisma.users.findFirst({
+        where: { email },
+      });
+      if (checkUserDB) {
+        return {
+          status: 400,
+          message: 'User already exists !',
+        };
+      } else {
+        const newUser = {
+          user_name,
+          avatar,
+          email,
+          pass_word,
+          phone,
+          birth_day,
+          gender,
+          role,
+          skill: skill || [],
+          certification: certification || [],
+        };
+        // await this.prisma.users.create({ data: newUser });
+        return {
+          status: 201,
+          message: 'The user has been created successfully !',
+        };
+      }
+    } catch (error) {
+      return { status: 500, message: `${error}` };
+    }
+  }
 
-  @ApiQuery({})
   @Delete('')
-  async deleteUser() {}
+  async deleteUser(user_id: number): Promise<any> {
+    try {
+      const checkUserDB = await this.prisma.users.findFirst({
+        where: { user_id },
+      });
 
-  @ApiQuery({})
-  @ApiQuery({})
-  @ApiQuery({})
+      if (!checkUserDB) {
+        return {
+          status: 404,
+          message: 'User not found',
+        };
+      }
+
+      await this.prisma.users.delete({
+        where: { user_id },
+      });
+
+      return {
+        status: 200,
+        message: 'Delete user successfully',
+      };
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        return {
+          status: 400,
+          message: 'Invalid data provided',
+        };
+      }
+
+      return {
+        status: 500,
+        message: `Error deleting user: ${error.message}`,
+      };
+    }
+  }
+
   @Get()
   async paginationSearchUser() {}
 

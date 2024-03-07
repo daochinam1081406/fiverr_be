@@ -13,6 +13,12 @@ export class AuthLoginDTO {
 
 export class AuthSignUpDTO {
   @ApiProperty({
+    description: 'id',
+    type: Number,
+  })
+  user_id: number;
+
+  @ApiProperty({
     description: 'user_name',
     type: String,
   })
@@ -62,13 +68,13 @@ export class AuthSignUpDTO {
 
   @ApiProperty({
     description: 'skill',
-    type: String,
+    type: [String],
   })
-  skill: string;
+  skill: string[];
 
   @ApiProperty({
     description: 'certification',
-    type: String,
+    type: [String],
   })
-  certification: string;
+  certification: string[];
 }
