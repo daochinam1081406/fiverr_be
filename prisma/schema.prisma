@@ -77,12 +77,12 @@ model Users {
   avatar        String?    @db.VarChar(255)
   email         String?    @db.VarChar(255)
   pass_word     String?    @db.VarChar(255)
-  phone         String?    @db.VarChar(50)
   birth_day     DateTime?  @db.Date
   gender        String?    @db.VarChar(10)
   role          String?    @db.VarChar(50)
   skill         String?    @db.VarChar(255)
   certification String?    @db.VarChar(255)
+  phone         Int?
   Comments      Comments[]
   HireJob       HireJob[]
   Job           Job[]

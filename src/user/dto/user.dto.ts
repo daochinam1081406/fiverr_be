@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PostUserDTO {
-  // @ApiProperty({
-  //   description: 'id',
-  //   type: Number,
-  // })
-  // user_id: number;
+  @ApiProperty({
+    description: 'user_id',
+    type: Number,
+  })
+  user_id: number;
 
   @ApiProperty({
     description: 'user_name',

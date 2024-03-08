@@ -10,16 +10,18 @@ import {
   Put,
   Res,
   Query,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 
 // import { FileInterceptor } from '@nestjs/platform-express';
 // import { diskStorage } from 'multer';
-import { ApiTags, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { DeleteUserDTO, PostUserDTO } from './dto/user.dto';
+import { Request } from 'express';
 
 @ApiTags('User')
-@Controller('user')
+@Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -29,28 +31,45 @@ export class UserController {
     return this.userService.getUser();
   }
 
+  // POST USER
   @Post('')
   @ApiBody({ type: PostUserDTO })
   async postUser(@Body() body: PostUserDTO, @Res() response): Promise<any> {
     const data = await this.userService.postUser(body);
     response.status(data.status).json(data);
+    // return this.userService.postUser(body);
   }
 
+  // DELETE USER
   @Delete('')
-  @ApiQuery({ name: 'user_id', type: 'number' })
-  async deleteUser(
-    @Query('user_id') user_id: number,
-    @Res() response,
-  ): Promise<any> {
-    const data = await this.userService.deleteUser(user_id);
-    response.status(data.status).json(data);
+  @ApiQuery({ name: 'user_id', type: Number })
+  async deleteUser(@Query('user_id') user_id: number): Promise<any> {
+    return this.userService.deleteUser(user_id);
   }
 
-  @Get('/pagination-search-user')
-  async paginationSearchUser() {}
+  // PAGINATION USER AND SEARCH USER
+  @Get('pagination-user')
+  @ApiQuery({ name: 'pageIndex', type: Number, required: false })
+  @ApiQuery({ name: 'pageSize', type: Number, required: false })
+  @ApiQuery({ name: 'keyword', type: String, required: false })
+  async paginationSearchUser(
+    @Query('pageIndex') pageIndex: number,
+    @Query('pageSize') pageSize: number,
+    @Query('keyword') keyword: string,
+  ): Promise<any> {
+    const Page = Number(pageIndex);
+    const Size = Number(pageSize);
+    const Skip = (Page - 1) * Size;
 
-  @Get('/:id')
-  async getUserById() {}
+    return this.userService.paginationSearchUser(Skip, Size, keyword);
+  }
+
+  // GET USER BY ID
+  @Get(':user_id')
+  @ApiParam({ name: 'user_id', type: Number })
+  async getUserById(@Param('user_id') user_id: number): Promise<any> {
+    return this.userService.getUserById(+user_id);
+  }
 
   @Put('/:id')
   async putUser() {}

@@ -18,14 +18,11 @@ export class UserService {
     this.prisma = new PrismaClient();
   }
 
-  @Get()
   async getUser(): Promise<any> {
     const data = await this.prisma.users.findMany();
     return data;
   }
 
-  @ApiBody({})
-  @Post()
   async postUser(body: PostUserDTO): Promise<any> {
     try {
       const {
@@ -72,7 +69,6 @@ export class UserService {
     }
   }
 
-  @Delete('')
   async deleteUser(user_id: number): Promise<any> {
     try {
       const checkUserDB = await this.prisma.users.findFirst({
@@ -109,11 +105,38 @@ export class UserService {
     }
   }
 
-  @Get()
-  async paginationSearchUser() {}
+  async paginationSearchUser(
+    Skip: number,
+    Size: number,
+    keyword: string,
+  ): Promise<any> {
+    const data = await this.prisma.users.findMany({
+      where: {
+        OR: [
+          {
+            user_name: {
+              contains: keyword,
+            },
+          },
+        ],
+      },
+      skip: Skip,
+      take: Size,
+    });
+    return data;
+  }
 
-  @Get()
-  async getUserById() {}
+  async getUserById(user_id: number): Promise<any> {
+    const user = await this.prisma.users.findFirst({
+      where: {
+        user_id,
+      },
+    });
+
+    if (!user) {
+    }
+    return user;
+  }
 
   @Put()
   async putUser() {}
