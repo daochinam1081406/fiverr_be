@@ -17,7 +17,7 @@ import { UserService } from './user.service';
 // import { FileInterceptor } from '@nestjs/platform-express';
 // import { diskStorage } from 'multer';
 import { ApiTags, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
-import { DeleteUserDTO, PostUserDTO } from './dto/user.dto';
+import { DeleteUserDTO, UserDTO } from './dto/user.dto';
 import { Request } from 'express';
 
 @ApiTags('User')
@@ -33,11 +33,10 @@ export class UserController {
 
   // POST USER
   @Post('')
-  @ApiBody({ type: PostUserDTO })
-  async postUser(@Body() body: PostUserDTO, @Res() response): Promise<any> {
+  @ApiBody({ type: UserDTO })
+  async postUser(@Body() body: UserDTO, @Res() response): Promise<any> {
     const data = await this.userService.postUser(body);
     response.status(data.status).json(data);
-    // return this.userService.postUser(body);
   }
 
   // DELETE USER
@@ -47,7 +46,7 @@ export class UserController {
     return this.userService.deleteUser(user_id);
   }
 
-  // PAGINATION USER AND SEARCH USER
+  // PAGINATION PAGE AND SEARCH USER
   @Get('pagination-user')
   @ApiQuery({ name: 'pageIndex', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
@@ -71,11 +70,23 @@ export class UserController {
     return this.userService.getUserById(+user_id);
   }
 
-  @Put('/:id')
-  async putUser() {}
+  // PUT USER BY ID
+  @Put(':id')
+  @ApiBody({ type: UserDTO })
+  @ApiParam({ name: 'user_id', type: Number })
+  async putUserById(@Body() body: UserDTO, @Res() response): Promise<any> {
+    const data = await this.userService.postUser(body);
+    response.status(data.status).json(data);
+  }
 
+  // SEARCH USER BY NAME
   @Get('/search/:user_name')
-  async getSearchUserByName() {}
+  @ApiParam({ name: 'user_name', type: String })
+  async getSearchUserByName(
+    @Param('user_name') user_name: string,
+  ): Promise<any> {
+    return this.getSearchUserByName(user_name);
+  }
 
   @Post('/upload-avatar')
   async uploadAvatar() {}
