@@ -1,19 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class AuthLoginDTO {
-  @ApiProperty({ type: String, description: 'email' })
-  @IsEmail()
-  email: string;
-
-  @ApiProperty({ type: String, description: 'password' })
-  @IsNotEmpty()
-  pass_word: string;
-}
-
-export class AuthSignUpDTO {
+export class UserDTO {
   @ApiProperty({
-    description: 'id',
+    description: 'user_id',
     type: Number,
   })
   user_id: number;
@@ -77,4 +66,12 @@ export class AuthSignUpDTO {
     type: [String],
   })
   certification: string[];
+}
+
+export class DeleteUserDTO {
+  @ApiProperty({
+    description: 'user_id',
+    type: Number,
+  })
+  user_id: number;
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AuthLoginDTO } from './dto/login.dto';
+import { AuthLoginDTO, AuthSignUpDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
@@ -12,6 +12,9 @@ export class AuthService {
 
   prisma = new PrismaClient();
 
+  constructor() {
+    this.prisma = new PrismaClient();
+  }
   // LOGIN
   async login(body: AuthLoginDTO): Promise<any> {
     try {
@@ -44,6 +47,54 @@ export class AuthService {
       }
     } catch (error) {
       return { status: 500, message: `User is not exist! ${error}` };
+    }
+  }
+
+  // SIGN-UP
+  async signUp(body: AuthSignUpDTO): Promise<any> {
+    try {
+      const {
+        user_name,
+        avatar,
+        email,
+        pass_word,
+        phone,
+        birth_day,
+        gender,
+        role,
+        skill,
+        certification,
+      } = body;
+
+      const checkUserDB = await this.prisma.users.findFirst({
+        where: { email: email },
+      });
+
+      if (checkUserDB) {
+        return { status: 400, message: 'User already exists!' };
+      } else {
+        const enCodePassword = bcrypt.hashSync(pass_word, 10);
+        const newUser = {
+          user_name,
+          email,
+          pass_word: enCodePassword,
+          phone,
+          birth_day,
+          gender,
+          role,
+          skill: skill || [],
+          certification: certification || [],
+        };
+        console.log(newUser);
+
+        // await this.prisma.users.create({ data: newUser });
+        return { status: 201, message: 'User signed up successfully!' };
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: `Failed to sign up user: ${error.message}`,
+      };
     }
   }
 }
