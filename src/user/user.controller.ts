@@ -3,22 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
-  UseInterceptors,
   Put,
   Res,
   Query,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-
 // import { FileInterceptor } from '@nestjs/platform-express';
 // import { diskStorage } from 'multer';
 import { ApiTags, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
-import { DeleteUserDTO, UserDTO } from './dto/user.dto';
-import { Request } from 'express';
+import { UserDTO } from './dto/user.dto';
 
 @ApiTags('User')
 @Controller('api/users')
@@ -88,6 +83,7 @@ export class UserController {
     return this.getSearchUserByName(user_name);
   }
 
+  // UPLOAD AVATAR
   @Post('/upload-avatar')
   async uploadAvatar() {}
   // @Post('/upload')

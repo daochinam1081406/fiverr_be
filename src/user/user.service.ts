@@ -1,6 +1,6 @@
-import { Delete, Get, Injectable, Post, Put } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
-import { DeleteUserDTO, UserDTO } from './dto/user.dto';
+import { Injectable, Post, Put } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { UserDTO } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -54,10 +54,10 @@ export class UserService {
           birth_day,
           gender,
           role,
-          skill: skill || [],
-          certification: certification || [],
+          skill,
+          certification,
         };
-        // await this.prisma.users.create({ data: newUser });
+        await this.prisma.users.create({ data: newUser });
         return {
           status: 201,
           message: 'The user has been created successfully !',
@@ -200,6 +200,6 @@ export class UserService {
     }
   }
 
-  @Post()
+  // UPLOAD AVATAR
   async uploadAvatar() {}
 }

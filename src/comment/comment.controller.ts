@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  Query,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CommentsDTO } from './dto/comments.dto';
 
-@Controller('comment')
+@ApiTags('Comments')
+@Controller('comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
-  }
-
+  // GET COMMENT
   @Get()
-  findAll() {
-    return this.commentService.findAll();
+  getComment(): Promise<any> {
+    return this.commentService.getComment();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
+  // POST COMMENT
+  @Post('')
+  @ApiBody({ type: CommentsDTO })
+  async postComment(@Body() body: CommentsDTO, @Res() response): Promise<any> {
+    const data = await this.commentService.postComment(body);
+    response.status(data.status).json(data);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
+  // PUT COMMENT
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+  //   return this.commentService.update(+id, updateCommentDto);
+  // }
+
+  // DELETE COMMENT
+  @Delete('')
+  @ApiQuery({ name: 'user_id', type: Number })
+  async deleteComment(@Query('user_id') user_id: number): Promise<any> {
+    return this.commentService.deleteComment(user_id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
-  }
+  // GET COMMENT BY JOB {JOB_ID}
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.commentService.findOne(+id);
+  // }
 }
