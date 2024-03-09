@@ -66,7 +66,7 @@ export class UserController {
   }
 
   // PUT USER BY ID
-  @Put(':id')
+  @Put(':user_id')
   @ApiBody({ type: UserDTO })
   @ApiParam({ name: 'user_id', type: Number })
   async putUserById(@Body() body: UserDTO, @Res() response): Promise<any> {
