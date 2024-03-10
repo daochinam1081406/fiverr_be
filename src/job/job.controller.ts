@@ -53,17 +53,25 @@ export class JobController {
   // GET JOB BY ID (RUN)
   @Get('/:job_id')
   @ApiParam({ name: 'job_id', type: Number })
-  async getJobById(@Param('job_id') job_id: number): Promise<any> {
+  getJobById(@Param('job_id') job_id: number): Promise<any> {
     return this.jobService.getJobById(+job_id);
   }
 
   // PUT JOB BY ID
-  // @Put(':id')
-  // putJob() {}
+  @Put(':job_id')
+  @ApiParam({ name: 'job_id', type: Number })
+  @ApiBody({ type: JobDTO })
+  putJob(@Param('job_id') job_id: number, @Body() body: JobDTO) {
+    return this.jobService.putJob(+job_id, body);
+  }
 
   // // DELETE JOB BY ID
-  // @Delete('')
-  // deleteJob() {}
+  // DELETE COMMENT BY ID COMMENT
+  @Delete(':job_id')
+  @ApiParam({ name: 'job_id', type: Number })
+  async deleteJob(@Query('job_id') job_id: number): Promise<any> {
+    return this.jobService.deleteJob(+job_id);
+  }
 
   // // POST UPLOAD IMAGE JOB BY ID
   // @Post('')
@@ -79,11 +87,25 @@ export class JobController {
   }
 
   // GET JOB BY JOB TYPE ID
-  // @Get('get-job-by-type-detail/:job_detail_type_id')
-  // @ApiParam({ name: 'job_detail_type_id', type: Number })
-  // getJobByJobTypeId(
-  //   @Param('job_detail_type_id') job_detail_type_id: number,
-  // ): Promise<any> {
-  //   return this.getJobByJobTypeId(+job_detail_type_id);
-  // }
+  @Get('get-job-by-type-detail/:job_detail_type_id')
+  @ApiParam({ name: 'job_detail_type_id', type: Number })
+  getJobByJobTypeId(
+    @Param('job_detail_type_id') job_detail_type_id: number,
+  ): Promise<any> {
+    return this.jobService.getJobByJobTypeId(+job_detail_type_id);
+  }
+
+  // GET JOB BY JOB ID
+  @Get('get-job-by-job-id/:job_id')
+  @ApiParam({ name: 'job_id', type: Number })
+  getJobByJobId(@Param('job_id') job_id: number) {
+    return this.jobService.getJobByJobId(+job_id);
+  }
+
+  // GET LIST JOB BY NAME
+  @Get('get-list-job/:name_job')
+  @ApiParam({ name: 'name_job', type: String })
+  getListJobByName(name_job: string): Promise<any> {
+    return this.jobService.getListJobByName(name_job);
+  }
 }
