@@ -1,26 +1,170 @@
-import { Injectable } from '@nestjs/common';
-import { CreateJobDto } from './dto/create-job.dto';
-import { UpdateJobDto } from './dto/update-job.dto';
+import { Injectable, Query } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { JobDTO } from './dto/job.dto';
+import { ApiParam } from '@nestjs/swagger';
 
 @Injectable()
 export class JobService {
-  create(createJobDto: CreateJobDto) {
-    return 'This action adds a new job';
+  private prisma = new PrismaClient();
+
+  // GET JOB (RUN)
+  async getJob(): Promise<any> {
+    return await this.prisma.job.findMany();
   }
 
-  findAll() {
-    return `This action returns all job`;
+  // POST JOB (RUN)
+  async postJob(body: JobDTO) {
+    try {
+      const {
+        job_id,
+        job_name,
+        rating,
+        price,
+        creator_id,
+        image,
+        description,
+        detail_type_id,
+        short_description,
+        job_rating,
+      } = body;
+
+      const newJob = {
+        job_name,
+        rating,
+        price,
+        creator_id,
+        image,
+        description,
+        detail_type_id,
+        short_description,
+        job_rating,
+      };
+
+      await this.prisma.job.create({ data: newJob });
+      return { status: 200, message: 'Create job successfull!' };
+    } catch (error) {
+      return { status: 500, message: `${error}` };
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} job`;
+  // PAGINATION JOB AND SEARCH JOB (RUN)
+  async paginationSearchJob(
+    pageIndex: number,
+    pageSize: number,
+    keyword: string,
+  ): Promise<any> {
+    try {
+      const skip = (pageIndex - 1) * pageSize;
+      const data = await this.prisma.job.findMany({
+        skip: skip,
+        take: Number(pageSize),
+        where: {
+          job_name: {
+            contains: keyword,
+          },
+        },
+      });
+      return {
+        status: 200,
+        data: data,
+        message: 'Successfull!',
+      };
+    } catch (error) {
+      return { status: 500, message: `${error}` };
+    }
   }
 
-  update(id: number, updateJobDto: UpdateJobDto) {
-    return `This action updates a #${id} job`;
+  // GET JOB BY ID (RUN)
+  async getJobById(job_id: number): Promise<any> {
+    try {
+      const job = await this.prisma.job.findUnique({
+        where: {
+          job_id: job_id,
+        },
+      });
+      return {
+        status: 200,
+        data: job,
+        message: 'Success',
+      };
+    } catch (error) {
+      return { status: 500, message: `${error}` };
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} job`;
+  // PUT JOB BY ID
+  // async putJob() {}
+
+  // // DELETE JOB BY ID
+  // async deleteJob() {}
+
+  // // POST UPLOAD IMAGE JOB BY ID
+  // async uploadImageJob() {}
+
+  // GET JOB BY MENU DETAIL JOB
+  async getMenuJobType(): Promise<any> {
+    try {
+      const data = await this.prisma.jobType.findMany({
+        include: {
+          JobDetailType: true,
+        },
+      });
+
+      if (!data || data.length === 0) {
+        return { status: 404, message: 'Menu job type not found' };
+      }
+
+      return {
+        status: 200,
+        data: data,
+        message: 'Successfull!',
+      };
+    } catch (error) {
+      return { status: 500, message: `${error}` };
+    }
   }
+
+  // GET JOB TYPE BY ID
+  async getDetailJobTypeById(job_type_id: number): Promise<any> {
+    try {
+      const jobTypeIdDB = await this.prisma.jobType.findFirst({
+        where: {
+          job_type_id,
+        },
+      });
+      if (jobTypeIdDB) {
+        const data = await this.prisma.jobType.findUnique({
+          where: {
+            job_type_id,
+          },
+          include: {
+            JobDetailType: true,
+          },
+        });
+        return {
+          message: 'Successfull!',
+          data: data,
+        };
+      } else {
+        return {
+          message: 'Job type id not found!',
+        };
+      }
+    } catch (error) {
+      return { status: 500, message: `${error}` };
+    }
+  }
+  // GET JOB BY JOB TYPE ID
+  // async getJobByJobTypeId(job_detail_type_id: number): Promise<any> {
+  //   const jobDetailTypeIdDB = await this.prisma.jobDetailType.findFirst({
+  //     where: {
+  //       job_detail_type_id,
+  //     },
+  //   });
+  // if (jobDetailTypeIdDB) {
+  //   const data = await this.prisma.job.findMany({
+  //     where: { job_detail_type_id },
+  //   });
+  // }
+  // }
 }

@@ -1,7 +1,6 @@
 import { Injectable, Post, Put } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UserDTO } from './dto/user.dto';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -71,24 +70,24 @@ export class UserService {
   // DELETE USER
   async deleteUser(user_id: number): Promise<any> {
     try {
-      const checkUserDB = await this.prisma.users.findFirst({
-        where: { user_id },
+      const checkUserDB = await this.prisma.users.findUnique({
+        where: { user_id: user_id },
       });
 
       if (!checkUserDB) {
         return {
           status: 404,
-          message: 'User already exists !',
+          message: 'User not found!',
         };
       }
 
       await this.prisma.users.delete({
-        where: { user_id },
+        where: { user_id: user_id },
       });
 
       return {
         status: 200,
-        message: 'Delete user successfully !',
+        message: 'Delete user successfully!',
       };
     } catch (error) {
       return {
@@ -169,7 +168,12 @@ export class UserService {
           skill: skill || [],
           certification: certification || [],
         };
-        // await this.prisma.users.update(newData);
+        //  await this.prisma.users.update({
+        //   where: {
+        //     user_id: 1
+        //   },
+        //   data: newData
+        //  });
         return {
           status: 201,
           message: 'Update user successfull!',

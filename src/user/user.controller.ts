@@ -22,7 +22,7 @@ export class UserController {
 
   // GET USER
   @Get()
-  async getUser(): Promise<any> {
+  getUser(): Promise<any> {
     return this.userService.getUser();
   }
 
@@ -35,10 +35,14 @@ export class UserController {
   }
 
   // DELETE USER
-  @Delete('')
-  @ApiQuery({ name: 'user_id', type: Number })
-  async deleteUser(@Query('user_id') user_id: number): Promise<any> {
-    return this.userService.deleteUser(user_id);
+  // @Delete('')
+  // @ApiQuery({ name: 'user_id', type: Number })
+  // async deleteUser(@Query('user_id') user_id: number): Promise<any> {
+  //   return this.userService.deleteUser(+user_id);
+  // }
+  @Delete(':id')
+  deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(+id);
   }
 
   // PAGINATION PAGE AND SEARCH USER
