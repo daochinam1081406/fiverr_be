@@ -1,138 +1,190 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { CommentsDTO } from './dto/comments.dto';
+import { CommentResponse } from './entities/comment.response';
+import { CommentEntity } from './entities/comment.entity';
 
 @Injectable()
 export class CommentService {
   prisma = new PrismaClient();
 
   // GET COMMENT
-  async getComment(): Promise<any> {
-    return await this.prisma.comments.findMany();
-  }
-
-  // POST COMMENT
-  async postComment(body: CommentsDTO): Promise<any> {
+  async getComment(): Promise<CommentResponse> {
     try {
-      const { comment_id } = body;
-      const { job_id, commenter_id, content, comment_rating, comment_date } =
-        body;
+      const data: CommentEntity[] = await this.prisma.comments.findMany();
+      return {
+        statusCode: 200,
+        content: data,
+        message: 'Get comment success!',
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  // POST COMMENT
+  async postComment(body: CommentsDTO): Promise<CommentResponse> {
+    try {
+      const { job_id, commenter_id, content, comment_rating } = body;
 
-      const commentDB = await this.prisma.comments.findFirst({
-        where: { comment_id },
+      const comment_date = new Date();
+
+      const checkCommentDB = await this.prisma.comments.findFirst({
+        where: { job_id, commenter_id, content },
       });
 
-      if (!commentDB) {
-        const commenterDB = await this.prisma.comments.findFirst({
-          where: {
-            commenter_id,
-          },
-        });
-
-        const jobDB = await this.prisma.comments.findFirst({
-          where: {
-            job_id,
-          },
-        });
-
-        if (commenterDB && jobDB) {
-          const newComment = {
+      if (checkCommentDB) {
+        throw new HttpException(
+          'Comment already exists!',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        const newComment: CommentEntity = await this.prisma.comments.create({
+          data: {
             job_id,
             commenter_id,
             comment_date,
-            comment_rating,
             content,
-          };
-          // const data = await this.prisma.comments.create(newComment);
-          return {
-            status: 200,
-            //data:data
-            message: 'Create comment successfull!',
-          };
-        } else {
-          return {
-            status: 400,
-            message: 'Commenters and jobs not found!',
-          };
-        }
+            comment_rating,
+          },
+        });
+        return {
+          statusCode: 201,
+          content: [newComment],
+          message: 'Comment created successfully!',
+        };
       }
-      return {
-        status: 400,
-        message: 'Comment already exists!',
-      };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // PUT COMMENT
-  async putCommentById(body: CommentsDTO): Promise<any> {
+  async putCommentById(
+    comment_id: number,
+    body: CommentsDTO,
+  ): Promise<CommentResponse> {
     try {
-      const { comment_id } = body;
-      const { comment_date, comment_rating, commenter_id, content, job_id } =
-        body;
-      const commentDB = await this.prisma.comments.findFirst({
-        where: { comment_id },
+      const comment = await this.prisma.comments.findFirst({
+        where: {
+          comment_id: Number(comment_id),
+        },
       });
-      if (commentDB) {
-        const newComment = {
-          comment_date,
-          job_id,
-          commenter_id,
-          comment_rating,
-          content,
-        };
-        // await this.prisma.comments.update(newComment);
-        return {
-          status: 201,
-          message: 'Update comment successfull!',
-        };
-      } else {
-        return { status: 400, message: 'No comment found!' };
+
+      if (!comment) {
+        return { statusCode: 404, message: 'Comment not found!', content: [] };
       }
+
+      let commentDate: Date | undefined = comment.comment_date;
+      if (body.comment_date) {
+        const parsedDate = new Date(body.comment_date);
+        if (!isNaN(parsedDate.getTime())) {
+          commentDate = parsedDate;
+        } else {
+          throw new Error(
+            'Invalid comment_date format! Please provide the date in ISO format (YYYY-MM-DDTHH:mm:ss.sssZ)',
+          );
+        }
+      }
+
+      const updatedComment = await this.prisma.comments.update({
+        where: {
+          comment_id: Number(comment_id),
+        },
+        data: {
+          job_id: body.job_id,
+          commenter_id: body.commenter_id,
+          comment_date: commentDate,
+          content: body.content,
+          comment_rating: body.comment_rating,
+        },
+      });
+
+      return {
+        statusCode: 200,
+        message: 'Update comment successfully!',
+        content: [updatedComment],
+      };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error updating comment: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // DELETE COMMENT
   async deleteComment(comment_id: number): Promise<any> {
-    const commentDB = await this.prisma.comments.findFirst({
-      where: {
-        comment_id,
-      },
-    });
-    if (commentDB) {
+    try {
+      const checkCommentDB = await this.prisma.comments.findUnique({
+        where: { comment_id },
+      });
+
+      if (!checkCommentDB) {
+        throw new HttpException('Comment not found!', HttpStatus.NOT_FOUND);
+      }
+
       await this.prisma.comments.delete({
         where: { comment_id },
       });
+
       return {
-        status: 200,
-        message: 'Delete successfull!',
+        status: HttpStatus.OK,
+        message: 'Delete comment successfully',
       };
-    } else {
-      return {
-        status: 400,
-        message: 'Delete fail!',
-      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error deleting comment: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // GET COMMENT BY JOB
-  async getCommentByJob(job_id: number) {
-    const job = await this.prisma.comments.findFirst({
-      where: {
-        job_id,
-      },
-    });
-
-    if (job) {
-      await this.prisma.comments.findMany({
+  async getCommentByJob(job_id: number): Promise<any> {
+    try {
+      const comments = await this.prisma.comments.findMany({
         where: {
-          job_id,
+          job_id: job_id,
         },
       });
-      return { status: 200, message: 'Get successfull!' };
+
+      if (!comments || comments.length === 0) {
+        return { status: 404, message: 'Comments not found', content: [] };
+      }
+
+      return {
+        status: 200,
+        message: 'Comments found',
+        content: comments,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving comments: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

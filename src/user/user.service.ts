@@ -12,7 +12,6 @@ export class UserService {
     this.prisma = new PrismaClient();
   }
 
-  // GET USER
   async getUser(): Promise<UserResponse> {
     try {
       const data: UserEntity[] = await this.prisma.users.findMany();
@@ -116,97 +115,120 @@ export class UserService {
 
   // PAGINATION PAGE AND SEARCH USER
   async paginationSearchUser(
-    Skip: number,
-    Size: number,
+    pageIndex: number,
+    pageSize: number,
     keyword: string,
-  ): Promise<any> {
-    const data = await this.prisma.users.findMany({
-      where: {
-        OR: [
-          {
-            user_name: {
-              contains: keyword,
-            },
+  ): Promise<UserResponse> {
+    try {
+      const skip = (pageIndex - 1) * pageSize;
+      const data: UserEntity[] = await this.prisma.users.findMany({
+        skip: skip,
+        take: Number(pageSize),
+        where: {
+          user_name: {
+            contains: keyword,
           },
-        ],
-      },
-      skip: Skip,
-      take: Size,
-    });
-    return data;
+        },
+      });
+
+      if (!data || data.length === 0) {
+        throw new HttpException('No users found', HttpStatus.NOT_FOUND);
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        content: data,
+        message: 'Successfully retrieved users with pagination and search!',
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving users: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   // GET USER BY ID
-  async getUserById(user_id: number): Promise<any> {
-    const user = await this.prisma.users.findFirst({
-      where: {
-        user_id,
-      },
-    });
-
-    if (!user) {
-      return { status: 400, message: 'User does not exist!' };
-    }
-    return user;
-  }
-
-  // PUT USER BY ID
-  async putUserById(body: UserDTO): Promise<any> {
+  async getUserById(user_id: number): Promise<UserResponse> {
     try {
-      const { user_id } = body;
-      const {
-        user_name,
-        email,
-        avatar,
-        birth_day,
-        certification,
-        gender,
-        pass_word,
-        phone,
-        role,
-        skill,
-      } = body;
       const user = await this.prisma.users.findFirst({
         where: {
           user_id,
         },
       });
 
-      if (user) {
-        const newData = {
-          user_name: user_name,
-          email: email,
-          pass_word: pass_word,
-          avatar: avatar,
-          birth_day: birth_day,
-          gender: gender,
-          phone: phone,
-          role: role,
-          skill: skill || [],
-          certification: certification || [],
-        };
-        //  await this.prisma.users.update({
-        //   where: {
-        //     user_id: 1
-        //   },
-        //   data: newData
-        //  });
-        return {
-          status: 201,
-          message: 'Update user successfull!',
-        };
+      if (!user) {
+        return { statusCode: 404, message: 'User not found', content: [] };
       }
 
-      if (!user) {
-        return { status: 400, message: 'User does not exist!' };
-      }
+      return {
+        statusCode: 200,
+        message: 'User found',
+        content: [user],
+      };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving users: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  // PUT USER BY ID
+  async putUserById(user_id: number, body: UserDTO): Promise<UserResponse> {
+    try {
+      const user = await this.prisma.users.findFirst({
+        where: {
+          user_id: Number(user_id),
+        },
+      });
+
+      if (!user) {
+        return { statusCode: 404, message: 'User not found!', content: [] };
+      }
+
+      const updatedUser = await this.prisma.users.update({
+        where: {
+          user_id: Number(user_id),
+        },
+        data: {
+          user_name: body.user_name,
+          email: body.email,
+          pass_word: body.pass_word,
+          avatar: body.avatar,
+          birth_day: body.birth_day ? new Date(body.birth_day) : user.birth_day,
+          gender: body.gender,
+          phone: body.phone,
+          role: body.role,
+          skill: body.skill,
+          certification: body.certification,
+        },
+      });
+
+      return {
+        statusCode: 200,
+        message: 'Update user successfully!',
+        content: [updatedUser],
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error updating user: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // SEARCH USER BY NAME
-  async getSearchUserByName(user_name: string): Promise<any> {
+  async getSearchUserByName(user_name: string): Promise<UserResponse> {
     try {
       const data = await this.prisma.users.findMany({
         where: {
@@ -215,9 +237,15 @@ export class UserService {
           },
         },
       });
-      return { status: 200, message: 'Successfull!', data: data };
+      return { statusCode: 200, message: 'Successful!', content: data };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving users: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 

@@ -61,14 +61,3 @@ export class JobDTO {
   })
   job_rating: number;
 }
-
-// "id": 0,
-// "tenCongViec": "string",
-// "danhGia": 0,
-// "giaTien": 0,
-// "nguoiTao": 0,
-// "hinhAnh": "string",
-// "moTa": "string",
-// "maChiTietLoaiCongViec": 0,
-// "moTaNgan": "string",
-// "saoCongViec": 0

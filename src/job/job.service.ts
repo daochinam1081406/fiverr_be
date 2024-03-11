@@ -1,61 +1,90 @@
-import { Injectable, Query } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Query } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { JobDTO } from './dto/job.dto';
 import { ApiParam } from '@nestjs/swagger';
+import { JobResponse, JobTypeResponse } from './entities/job.response';
+import { JobEntity } from './entities/job.entity';
 
 @Injectable()
 export class JobService {
   private prisma = new PrismaClient();
 
-  // GET JOB (RUN)
-  async getJob(): Promise<any> {
-    return await this.prisma.job.findMany();
-  }
-
-  // POST JOB (RUN)
-  async postJob(body: JobDTO) {
+  async getJob(): Promise<JobResponse> {
     try {
-      const {
-        job_id,
-        job_name,
-        rating,
-        price,
-        creator_id,
-        image,
-        description,
-        detail_type_id,
-        short_description,
-        job_rating,
-      } = body;
-
-      const newJob = {
-        job_name,
-        rating,
-        price,
-        creator_id,
-        image,
-        description,
-        detail_type_id,
-        short_description,
-        job_rating,
-      };
-
-      await this.prisma.job.create({ data: newJob });
-      return { status: 200, message: 'Create job successfull!' };
+      const data: JobEntity[] = await this.prisma.job.findMany();
+      return { statusCode: 200, content: data, message: 'Get job success!' };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  // PAGINATION JOB AND SEARCH JOB (RUN)
+  async postJob(body: JobDTO): Promise<JobResponse> {
+    try {
+      const {
+        job_id,
+        creator_id,
+        description,
+        detail_type_id,
+        image,
+        job_name,
+        job_rating,
+        price,
+        rating,
+        short_description,
+      } = body;
+      const checkJobDB = await this.prisma.job.findFirst({
+        where: { job_id },
+      });
+      if (checkJobDB) {
+        throw new HttpException('Job already exists!', HttpStatus.BAD_REQUEST);
+      } else {
+        const newJob: JobEntity = await this.prisma.job.create({
+          data: {
+            job_id,
+            creator_id,
+            description,
+            detail_type_id,
+            image,
+            job_name,
+            job_rating,
+            price,
+            rating,
+            short_description,
+          },
+        });
+        return {
+          statusCode: 201,
+          content: [newJob],
+          message: 'Job created successfully!',
+        };
+      }
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async paginationSearchJob(
     pageIndex: number,
     pageSize: number,
     keyword: string,
-  ): Promise<any> {
+  ): Promise<JobResponse> {
     try {
       const skip = (pageIndex - 1) * pageSize;
-      const data = await this.prisma.job.findMany({
+      const data: JobEntity[] = await this.prisma.job.findMany({
         skip: skip,
         take: Number(pageSize),
         where: {
@@ -64,17 +93,27 @@ export class JobService {
           },
         },
       });
+
+      if (!data || data.length === 0) {
+        throw new HttpException('No jobs found', HttpStatus.NOT_FOUND);
+      }
+
       return {
-        status: 200,
-        data: data,
-        message: 'Successfull!',
+        statusCode: HttpStatus.OK,
+        content: data,
+        message: 'Successfully retrieved jobs with pagination and search!',
       };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving jobs: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  // GET JOB BY ID (RUN)
   async getJobById(job_id: number): Promise<any> {
     try {
       const job = await this.prisma.job.findUnique({
@@ -88,11 +127,16 @@ export class JobService {
         message: 'Success',
       };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving users: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  // PUT JOB BY ID
   async putJob(job_id: number, body: JobDTO): Promise<any> {
     const {
       creator_id,
@@ -129,7 +173,7 @@ export class JobService {
     }
   }
 
-  // // DELETE JOB BY ID (NO RUN)
+  // NO RUN
   async deleteJob(job_id: number): Promise<any> {
     const jobDB = await this.prisma.comments.findFirst({
       where: {
@@ -155,7 +199,6 @@ export class JobService {
   // // POST UPLOAD IMAGE JOB BY ID
   // async uploadImageJob() {}
 
-  // GET JOB BY MENU DETAIL JOB (RUN)
   async getMenuJobType(): Promise<any> {
     try {
       const data = await this.prisma.jobType.findMany({
@@ -165,20 +208,29 @@ export class JobService {
       });
 
       if (!data || data.length === 0) {
-        return { status: 404, message: 'Menu job type not found' };
+        return {
+          statusCode: 404,
+          message: 'Menu job type not found',
+          content: data,
+        };
       }
 
       return {
-        status: 200,
-        data: data,
+        statusCode: 200,
+        content: data,
         message: 'Successfull!',
       };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving users: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  // GET JOB TYPE BY ID (RUN)
   async getDetailJobTypeById(job_type_id: number): Promise<any> {
     try {
       const jobTypeIdDB = await this.prisma.jobType.findFirst({
@@ -205,7 +257,13 @@ export class JobService {
         };
       }
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error retrieving users: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
   // GET JOB BY JOB TYPE ID (NO RUN)
@@ -225,5 +283,6 @@ export class JobService {
     return;
   }
 
+  // NO RUN
   async getListJobByName(name_job: string): Promise<any> {}
 }
