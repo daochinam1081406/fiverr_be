@@ -14,64 +14,60 @@ import { UserService } from './user.service';
 // import { diskStorage } from 'multer';
 import { ApiTags, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { UserDTO } from './dto/user.dto';
+import { UserResponse } from './entities/user.response';
 
 @ApiTags('User')
 @Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // GET USER
   @Get()
-  async getUser(): Promise<any> {
+  getUser(): Promise<UserResponse> {
     return this.userService.getUser();
   }
 
   // POST USER
   @Post('')
   @ApiBody({ type: UserDTO })
-  async postUser(@Body() body: UserDTO, @Res() response): Promise<any> {
-    const data = await this.userService.postUser(body);
-    response.status(data.status).json(data);
+  async postUser(@Body() body: UserDTO): Promise<UserResponse> {
+    return this.userService.postUser(body);
   }
 
   // DELETE USER
-  @Delete('')
-  @ApiQuery({ name: 'user_id', type: Number })
-  async deleteUser(@Query('user_id') user_id: number): Promise<any> {
-    return this.userService.deleteUser(user_id);
+  @Delete(':user_id')
+  deleteUser(@Param('user_id') user_id: number) {
+    return this.userService.deleteUser(+user_id);
   }
 
   // PAGINATION PAGE AND SEARCH USER
-  @Get('pagination-user')
+  @Get('pagination-search-user')
   @ApiQuery({ name: 'pageIndex', type: Number, required: false })
   @ApiQuery({ name: 'pageSize', type: Number, required: false })
   @ApiQuery({ name: 'keyword', type: String, required: false })
-  async paginationSearchUser(
+  paginationSearchJob(
     @Query('pageIndex') pageIndex: number,
     @Query('pageSize') pageSize: number,
     @Query('keyword') keyword: string,
   ): Promise<any> {
-    const Page = Number(pageIndex);
-    const Size = Number(pageSize);
-    const Skip = (Page - 1) * Size;
-
-    return this.userService.paginationSearchUser(Skip, Size, keyword);
+    return this.userService.paginationSearchUser(pageIndex, pageSize, keyword);
   }
 
   // GET USER BY ID
   @Get(':user_id')
   @ApiParam({ name: 'user_id', type: Number })
-  async getUserById(@Param('user_id') user_id: number): Promise<any> {
+  getUserById(@Param('user_id') user_id: number): Promise<UserResponse> {
     return this.userService.getUserById(+user_id);
   }
 
   // PUT USER BY ID
   @Put(':user_id')
-  @ApiBody({ type: UserDTO })
   @ApiParam({ name: 'user_id', type: Number })
-  async putUserById(@Body() body: UserDTO, @Res() response): Promise<any> {
-    const data = await this.userService.postUser(body);
-    response.status(data.status).json(data);
+  @ApiBody({ type: UserDTO })
+  putUserById(
+    @Body() body: UserDTO,
+    @Param('user_id') user_id,
+  ): Promise<UserResponse> {
+    return this.userService.putUserById(user_id, body);
   }
 
   // SEARCH USER BY NAME
@@ -79,8 +75,8 @@ export class UserController {
   @ApiParam({ name: 'user_name', type: String })
   async getSearchUserByName(
     @Param('user_name') user_name: string,
-  ): Promise<any> {
-    return this.getSearchUserByName(user_name);
+  ): Promise<UserResponse> {
+    return this.userService.getSearchUserByName(user_name);
   }
 
   // UPLOAD AVATAR

@@ -1,77 +1,39 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDTO {
-  @ApiProperty({
-    description: 'user_id',
-    type: Number,
-  })
+  @ApiProperty({ description: 'User ID', type: Number })
   user_id: number;
 
-  @ApiProperty({
-    description: 'user_name',
-    type: String,
-  })
+  @ApiProperty({ description: 'User name', type: String })
   user_name: string;
 
-  @ApiProperty({
-    description: 'avatar',
-    type: String,
-  })
+  @ApiProperty({ description: 'Avatar URL', type: String })
   avatar: string;
 
-  @ApiProperty({
-    description: 'email',
-    type: String,
-  })
+  @ApiProperty({ description: 'Email address', type: String })
   email: string;
 
-  @ApiProperty({
-    description: 'pass_word',
-    type: String,
-  })
+  @ApiProperty({ description: 'Password', type: String })
   pass_word: string;
 
-  @ApiProperty({
-    description: 'phone',
-    type: Number,
-  })
+  @ApiProperty({ description: 'Phone number', type: Number })
   phone: number;
 
-  @ApiProperty({
-    description: 'birth_day',
-    type: String,
-  })
+  @ApiProperty({ description: 'Birth day', type: String })
   birth_day: string;
 
-  @ApiProperty({
-    description: 'gender',
-    type: String,
-  })
+  @ApiProperty({ description: 'Gender', type: String })
   gender: string;
 
-  @ApiProperty({
-    description: 'role',
-    type: String,
-  })
+  @ApiProperty({ description: 'Role', type: String })
   role: string;
 
-  @ApiProperty({
-    description: 'skill',
-    type: String,
-  })
+  @ApiProperty({ description: 'Skill', type: String })
   skill: string;
 
   @ApiProperty({
-    description: 'certification',
+    description: 'Certification',
     type: String,
   })
   certification: string;
-}
-
-export class DeleteUserDTO {
-  @ApiProperty({
-    description: 'user_id',
-    type: Number,
-  })
-  user_id: number;
 }

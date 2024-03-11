@@ -13,6 +13,7 @@ import {
 import { CommentService } from './comment.service';
 import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CommentsDTO } from './dto/comments.dto';
+import { CommentResponse } from './entities/comment.response';
 
 @ApiTags('Comments')
 @Controller('api/comment')
@@ -21,41 +22,38 @@ export class CommentController {
 
   // GET COMMENT
   @Get()
-  getComment(): Promise<any> {
+  getComment(): Promise<CommentResponse> {
     return this.commentService.getComment();
   }
 
   // POST COMMENT
-  @Post()
+  @Post('')
   @ApiBody({ type: CommentsDTO })
-  async postComment(@Body() body: CommentsDTO, @Res() response): Promise<any> {
-    const data = await this.commentService.postComment(body);
-    response.status(data.status).json(data);
+  async postComment(@Body() body: CommentsDTO): Promise<CommentResponse> {
+    return this.commentService.postComment(body);
   }
 
   // PUT COMMENT BY ID
   @Put(':comment_id')
-  @ApiBody({ type: CommentsDTO })
   @ApiParam({ name: 'comment_id', type: Number })
-  async putCommentById(
+  @ApiBody({ type: CommentsDTO })
+  putCommentById(
     @Body() body: CommentsDTO,
-    @Res() response,
-  ): Promise<any> {
-    const data = await this.commentService.putCommentById(body);
-    response.status(data.status).json(data);
+    @Param('comment_id') comment_id: number,
+  ): Promise<CommentResponse> {
+    return this.commentService.putCommentById(comment_id, body);
   }
 
   // DELETE COMMENT BY ID COMMENT
   @Delete(':comment_id')
-  @ApiQuery({ name: 'user_id', type: Number })
-  async deleteComment(@Query('comment_id') comment_id: number): Promise<any> {
+  deleteComment(@Param('comment_id') comment_id: number) {
     return this.commentService.deleteComment(+comment_id);
   }
 
   // GET COMMENT BY JOB {JOB_ID}
-  @Get('/get-comment-by-job/:job_id')
+  @Get('get-comment-by-job/:job_id')
   @ApiParam({ name: 'job_id', type: Number })
-  async getCommentByJob(@Param('job_id') job_id: number): Promise<any> {
-    return this.commentService.getCommentByJob(job_id);
+  getCommentByJob(@Param('job_id') job_id: number): Promise<any> {
+    return this.commentService.getCommentByJob(+job_id);
   }
 }
