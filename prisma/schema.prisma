@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -69,6 +70,8 @@ model JobType {
   job_type_id   Int             @id @default(autoincrement())
   type_name     String?         @db.VarChar(255)
   JobDetailType JobDetailType[]
+
+  @@fulltext([type_name])
 }
 
 model Users {
