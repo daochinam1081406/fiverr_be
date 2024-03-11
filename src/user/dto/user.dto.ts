@@ -1,77 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDTO {
-  @ApiProperty({
-    description: 'user_id',
-    type: Number,
-  })
+  @ApiProperty({ name: 'id', description: 'User ID', type: Number })
   user_id: number;
 
-  @ApiProperty({
-    description: 'user_name',
-    type: String,
-  })
+  @ApiProperty({ name: 'name', description: 'User name', type: String })
   user_name: string;
 
-  @ApiProperty({
-    description: 'avatar',
-    type: String,
-  })
+  @ApiProperty({ name: 'avatar', description: 'Avatar URL', type: String })
   avatar: string;
 
-  @ApiProperty({
-    description: 'email',
-    type: String,
-  })
+  @ApiProperty({ name: 'email', description: 'Email address', type: String })
   email: string;
 
-  @ApiProperty({
-    description: 'pass_word',
-    type: String,
-  })
+  @ApiProperty({ name: 'password', description: 'Password', type: String })
   pass_word: string;
 
-  @ApiProperty({
-    description: 'phone',
-    type: Number,
-  })
+  @ApiProperty({ name: 'phone', description: 'Phone number', type: Number })
   phone: number;
 
-  @ApiProperty({
-    description: 'birth_day',
-    type: String,
-  })
+  @ApiProperty({ name: 'birthday', description: 'Birth day', type: String })
   birth_day: string;
 
-  @ApiProperty({
-    description: 'gender',
-    type: String,
-  })
+  @ApiProperty({ name: 'gender', description: 'Gender', type: String })
   gender: string;
 
-  @ApiProperty({
-    description: 'role',
-    type: String,
-  })
+  @ApiProperty({ name: 'role', description: 'Role', type: String })
   role: string;
 
-  @ApiProperty({
-    description: 'skill',
-    type: String,
-  })
+  @ApiProperty({ name: 'skill', description: 'Skill', type: String })
   skill: string;
 
   @ApiProperty({
-    description: 'certification',
+    name: 'certification',
+    description: 'Certification',
     type: String,
   })
   certification: string;
-}
-
-export class DeleteUserDTO {
-  @ApiProperty({
-    description: 'user_id',
-    type: Number,
-  })
-  user_id: number;
 }

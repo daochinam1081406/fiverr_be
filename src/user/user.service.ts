@@ -1,6 +1,8 @@
-import { Injectable, Post, Put } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UserDTO } from './dto/user.dto';
+import { UserResponse } from './entities/user.response';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -11,19 +13,27 @@ export class UserService {
   }
 
   // GET USER
-  async getUser(): Promise<any> {
+  async getUser(): Promise<UserResponse> {
     try {
-      const data = await this.prisma.users.findMany();
-      return { data: data, status: 200, message: 'Get user successfull!' };
+      const data: UserEntity[] = await this.prisma.users.findMany();
+      return { statusCode: 200, content: data, message: 'Get user success!' };
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   // POST USER
-  async postUser(body: UserDTO): Promise<any> {
+  async postUser(body: UserDTO): Promise<UserResponse> {
     try {
       const {
+        user_id,
         user_name,
         avatar,
         email,
@@ -39,31 +49,38 @@ export class UserService {
         where: { email },
       });
       if (checkUserDB) {
-        return {
-          status: 400,
-          message: 'User already exists !',
-        };
+        throw new HttpException('User already exists!', HttpStatus.BAD_REQUEST);
       } else {
-        const newUser = {
-          user_name,
-          avatar,
-          email,
-          pass_word,
-          phone,
-          birth_day,
-          gender,
-          role,
-          skill,
-          certification,
-        };
-        await this.prisma.users.create({ data: newUser });
+        const newUser: UserEntity = await this.prisma.users.create({
+          data: {
+            user_id,
+            user_name,
+            avatar,
+            email,
+            pass_word,
+            phone,
+            birth_day,
+            gender,
+            role,
+            skill,
+            certification,
+          },
+        });
         return {
-          status: 201,
-          message: 'The user has been created successfully !',
+          statusCode: 201,
+          content: [newUser],
+          message: 'User created successfully!',
         };
       }
     } catch (error) {
-      return { status: 500, message: `${error}` };
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Internal server error',
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -71,29 +88,29 @@ export class UserService {
   async deleteUser(user_id: number): Promise<any> {
     try {
       const checkUserDB = await this.prisma.users.findUnique({
-        where: { user_id: user_id },
+        where: { user_id },
       });
 
       if (!checkUserDB) {
-        return {
-          status: 404,
-          message: 'User not found!',
-        };
+        throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
       }
 
       await this.prisma.users.delete({
-        where: { user_id: user_id },
+        where: { user_id },
       });
 
       return {
-        status: 200,
-        message: 'Delete user successfully!',
+        status: HttpStatus.OK,
+        message: 'Delete user successfully',
       };
     } catch (error) {
-      return {
-        status: 500,
-        message: `Error deleting user: ${error.message}`,
-      };
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: `Error deleting user: ${error.message}`,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 

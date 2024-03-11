@@ -8,40 +8,36 @@ import {
   Put,
   Res,
   Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { FileInterceptor } from '@nestjs/platform-express';
 // import { diskStorage } from 'multer';
 import { ApiTags, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { UserDTO } from './dto/user.dto';
+import { UserResponse } from './entities/user.response';
 
 @ApiTags('User')
 @Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // GET USER
   @Get()
-  getUser(): Promise<any> {
+  getUser(): Promise<UserResponse> {
     return this.userService.getUser();
   }
 
   // POST USER
   @Post('')
   @ApiBody({ type: UserDTO })
-  async postUser(@Body() body: UserDTO, @Res() response): Promise<any> {
-    const data = await this.userService.postUser(body);
-    response.status(data.status).json(data);
+  async postUser(@Body() body: UserDTO): Promise<UserResponse> {
+    return this.userService.postUser(body);
   }
 
   // DELETE USER
-  // @Delete('')
-  // @ApiQuery({ name: 'user_id', type: Number })
-  // async deleteUser(@Query('user_id') user_id: number): Promise<any> {
-  //   return this.userService.deleteUser(+user_id);
-  // }
   @Delete(':id')
-  deleteUser(@Param('id') id: string) {
+  deleteUser(@Param('id') id: number) {
     return this.userService.deleteUser(+id);
   }
 
@@ -75,7 +71,7 @@ export class UserController {
   @ApiParam({ name: 'user_id', type: Number })
   async putUserById(@Body() body: UserDTO, @Res() response): Promise<any> {
     const data = await this.userService.postUser(body);
-    response.status(data.status).json(data);
+    // response.status(data.status).json(data);
   }
 
   // SEARCH USER BY NAME
