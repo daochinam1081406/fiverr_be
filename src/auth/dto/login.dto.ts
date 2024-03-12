@@ -68,13 +68,13 @@ export class AuthSignUpDTO {
 
   @ApiProperty({
     description: 'skill',
-    type: [String],
+    type: String,
   })
-  skill: string[];
+  skill: string;
 
   @ApiProperty({
     description: 'certification',
-    type: [String],
+    type: String,
   })
-  certification: string[];
+  certification: string;
 }
