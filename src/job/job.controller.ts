@@ -8,11 +8,21 @@ import {
   Delete,
   Query,
   Put,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { JobService } from './job.service';
-import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JobDTO } from './dto/job.dto';
 import { JobResponse, JobTypeResponse } from './entities/job.response';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @ApiTags('Job')
 @Controller('api/job')
@@ -69,11 +79,42 @@ export class JobController {
     return this.jobService.deleteJob(+job_id);
   }
 
-  // // POST UPLOAD IMAGE JOB BY ID
-  // @Post('')
-  // async uploadImageJob() {}
+  // POST UPLOAD IMAGE JOB BY ID
+  @ApiParam({ name: 'job_id', required: true })
+  @Post('/upload-job-image/:job_id')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Upload a file',
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: process.cwd() + '/public/img',
+        filename: (req, file, callback) => {
+          callback(null, new Date().getTime() + `${file.originalname}`);
+        },
+      }),
+    }),
+  )
+  uploadJob(
+    @UploadedFile('file') file,
+    @Param('job_id') job_id: number,
+    @Body() body: JobDTO,
+  ): Promise<any> {
+    return this.jobService.uploadJob(file.filename, +job_id, body);
+  }
 
-  // GET DETAIL JOB TYPE BY ID
+  // GET DETAIL JOB TYPE BY ID (RUN)
   @Get('get-job-type-details/:job_type_id')
   @ApiParam({ name: 'job_type_id', type: Number })
   getDetailJobTypeById(
@@ -82,26 +123,26 @@ export class JobController {
     return this.jobService.getDetailJobTypeById(+job_type_id);
   }
 
-  // GET JOB BY JOB TYPE ID
-  @Get('get-job-by-type-detail/:job_detail_type_id')
-  @ApiParam({ name: 'job_detail_type_id', type: Number })
-  getJobByJobTypeId(
-    @Param('job_detail_type_id') job_detail_type_id: number,
+  // GET JOB BY DETAIL TYPE
+  @Get('get-job-by-detail-type/:detail_type_id')
+  @ApiParam({ name: 'detail_type_id', type: Number })
+  getJobByDetailType(
+    @Param('detail_type_id') detail_type_id: number,
   ): Promise<any> {
-    return this.jobService.getJobByJobTypeId(+job_detail_type_id);
+    return this.jobService.getJobByDetailType(detail_type_id);
   }
 
   // GET JOB BY JOB ID
-  @Get('get-job-by-job-id/:job_id')
-  @ApiParam({ name: 'job_id', type: Number })
-  getJobByJobId(@Param('job_id') job_id: number) {
-    return this.jobService.getJobByJobId(+job_id);
-  }
+  // @Get('get-job-by-job-id/:job_id')
+  // @ApiParam({ name: 'job_id', type: Number })
+  // getJobByJobId(@Param('job_id') job_id: number) {
+  //   return this.jobService.getJobByJobId(+job_id);
+  // }
 
   // GET LIST JOB BY NAME
-  @Get('get-list-job/:name_job')
-  @ApiParam({ name: 'name_job', type: String })
-  getListJobByName(name_job: string): Promise<any> {
-    return this.jobService.getListJobByName(name_job);
-  }
+  // @Get('get-list-job/:name_job')
+  // @ApiParam({ name: 'name_job', type: String })
+  // getListJobByName(name_job: string): Promise<any> {
+  //   return this.jobService.getListJobByName(name_job);
+  // }
 }

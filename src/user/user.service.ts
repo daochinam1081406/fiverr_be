@@ -3,12 +3,14 @@ import { PrismaClient } from '@prisma/client';
 import { UserDTO } from './dto/user.dto';
 import { UserResponse } from './entities/user.response';
 import { UserEntity } from './entities/user.entity';
-
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { v2 } from 'cloudinary';
+import toStream from 'buffer-to-stream';
 @Injectable()
 export class UserService {
   private prisma = new PrismaClient();
 
-  constructor() {
+  constructor(private readonly cloudinaryService: CloudinaryService) {
     this.prisma = new PrismaClient();
   }
 
@@ -250,5 +252,19 @@ export class UserService {
   }
 
   // UPLOAD AVATAR
-  async uploadAvatar() {}
+  async uploadAvatar(
+    filename: string,
+    user_id: number,
+    body: UserDTO,
+  ): Promise<any> {
+    let upload = { ...body };
+    upload.avatar = filename;
+    await this.prisma.users.update({
+      where: {
+        user_id: user_id,
+      },
+      data: upload,
+    });
+    return `Upload Image success !`;
+  }
 }
