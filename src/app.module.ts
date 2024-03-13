@@ -8,6 +8,9 @@ import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
 import { JobModule } from './job/job.module';
 import { JobTypeModule } from './job-type/job-type.module';
+import { JobTypeDetailModule } from './job-detail-type/job-type-detail.module';
+import { HireJobModule } from './hire-job/hire-job.module';
+
 
 @Module({
   imports: [
@@ -18,6 +21,8 @@ import { JobTypeModule } from './job-type/job-type.module';
     CommentModule,
     JobModule,
     JobTypeModule,
+    JobTypeDetailModule,
+    HireJobModule,
   ],
   controllers: [AppController],
   providers: [AppService],
