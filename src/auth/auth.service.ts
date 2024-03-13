@@ -32,7 +32,6 @@ export class AuthService {
             email: checkEmail.email,
             role: checkEmail.role,
           };
-          console.log(payload);
           let token = this.jwtService.sign(payload, {
             secret: this.configService.get('SECRET_KEY'),
             expiresIn: this.configService.get('EXPIRES_IN'),
