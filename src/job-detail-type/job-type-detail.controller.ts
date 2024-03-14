@@ -7,48 +7,66 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuards } from 'src/strategy/role.stratey';
+
 @ApiTags('JobTypeDetail')
 @Controller('/api/job-type-detail')
 export class JobTypeDetailController {
   constructor(private readonly jobTypeDetailService: JobTypeDetailService) { }
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard("jwt"))
+
+
   @Get()
-  findAll(): Promise<any> {
-    return this.jobTypeDetailService.findAll();
+  async findAll(): Promise<any> {
+    try {
+      return await this.jobTypeDetailService.findAll();
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt"), RoleGuards)
   @Post()
-  create(@Body() createJobTypeDetailDto: CreateJobTypeDetailDto): Promise<string> {
-    return this.jobTypeDetailService.create(createJobTypeDetailDto);
+  async create(@Body() createJobTypeDetailDto: CreateJobTypeDetailDto): Promise<string> {
+    try {
+      return await this.jobTypeDetailService.create(createJobTypeDetailDto);
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt"))
   @ApiQuery({ name: "keyword", required: true, description: "filter name" })
   @ApiQuery({ name: "size", required: true, description: "number item in page" })
   @ApiQuery({ name: "page", required: true, description: "page number" })
   @Get('/pagination-search')
-  findwidthpage(@Query("size") size, @Query("page") page, @Query("keyword") keyword): Promise<any> {
-
-    let numPage = Number(page);
-    let numSize = Number(size);
-    let skip = (numPage - 1) * numSize;
-    return this.jobTypeDetailService.findWidthPage(skip, numSize, keyword);
+  async findwidthpage(@Query("size") size, @Query("page") page, @Query("keyword") keyword): Promise<any> {
+    try {
+      let numPage = Number(page);
+      let numSize = Number(size);
+      let skip = (numPage - 1) * numSize;
+      return await this.jobTypeDetailService.findWidthPage(skip, numSize, keyword);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt"))
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<any> {
-    return this.jobTypeDetailService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<any> {
+    try {
+      return await this.jobTypeDetailService.findOne(+id);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt"), RoleGuards)
   @ApiParam({ name: "id", required: true, description: "id job type detail" })
   @Post("/upload-image-job-type-detail/:id")
-  @ApiConsumes('multipart/form-data') // Specify the media type for file upload
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Upload a file',
     type: 'multipart/form-data',
@@ -70,24 +88,33 @@ export class JobTypeDetailController {
       }
     })
   }))
-  upload(@UploadedFile("file") file, @Param('id') id: number, @Body() updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<string> {
-    return this.jobTypeDetailService.upload(file.filename, +id, updateJobTypeDetailDto);
+  async upload(@UploadedFile("file") file, @Param('id') id: number, @Body() updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<string> {
+    try {
+      return await this.jobTypeDetailService.upload(file.filename, +id, updateJobTypeDetailDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt"), RoleGuards)
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<string> {
-    return this.jobTypeDetailService.update(+id, updateJobTypeDetailDto);
+  async update(@Param('id') id: string, @Body() updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<string> {
+    try {
+      return await this.jobTypeDetailService.update(+id, updateJobTypeDetailDto);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt"), RoleGuards)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<string> {
-    return this.jobTypeDetailService.remove(+id);
+  async remove(@Param('id') id: string): Promise<string> {
+    try {
+      return await this.jobTypeDetailService.remove(+id);
+    } catch (error) {
+      throw error;
+    }
   }
-
-
-
 }

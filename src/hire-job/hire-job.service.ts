@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateHireJobDto } from './dto/create-hire-job.dto';
 import { UpdateHireJobDto } from './dto/update-hire-job.dto';
 import { PrismaClient } from '@prisma/client';
@@ -8,73 +8,118 @@ export class HireJobService {
   prisma = new PrismaClient();
 
   async create(createHireJobDto: CreateHireJobDto): Promise<string> {
-    let newData = { ...createHireJobDto };
-    await this.prisma.hireJob.create({
-      data: newData,
-    });
-    return 'Cteate successfully!';
+    try {
+      let newData = { ...createHireJobDto };
+      await this.prisma.hireJob.create({
+        data: newData,
+      });
+      return 'Created successfully!';
+    } catch (error) {
+      throw new NotFoundException('Failed to create hire job.');
+    }
   }
 
   async update(body: UpdateHireJobDto, hire_job_id: number): Promise<string> {
-    let updateHireJob = { ...body };
-    await this.prisma.hireJob.update({
-      where: {
-        hire_job_id: hire_job_id,
-      },
-      data: updateHireJob,
-    });
-
-    return `Update successfully! `;
+    try {
+      let updateHireJob = { ...body };
+      await this.prisma.hireJob.update({
+        where: {
+          hire_job_id: hire_job_id,
+        },
+        data: updateHireJob,
+      });
+      return 'Updated successfully!';
+    } catch (error) {
+      throw new NotFoundException('Failed to update hire job.');
+    }
   }
 
-  async findAll() {
-    let data = this.prisma.hireJob.findMany();
-    return data;
+  async findAll(): Promise<any> {
+    try {
+      let data = await this.prisma.hireJob.findMany();
+      return data;
+    } catch (error) {
+      throw new NotFoundException('Failed to find hire jobs.');
+    }
   }
 
-  async findAllByUserID(id: number) {
-    let data = await this.prisma.hireJob.findMany({
-      where: {
-        employer_id: id,
-      },
-    });
-    return data;
+  async findAllByUserID(userId: number): Promise<any> {
+    try {
+      const data = await this.prisma.hireJob.findMany({
+        where: {
+          employer_id: userId,
+        },
+      });
+      return data;
+    } catch (error) {
+      throw new NotFoundException('Failed to find hire jobs by user ID.');
+    }
+  }
+  async findWidthPage(skip: number, numSize: number, keyword: string): Promise<any> {
+    try {
+      if (isNaN(skip) || isNaN(numSize) || !keyword) {
+        return { error: 'Please input valid parameters' };
+      }
+
+      const data = await this.prisma.hireJob.findMany({
+        where: {
+          Job: {
+            job_name: {
+              contains: keyword,
+            },
+          },
+        },
+        include: {
+          Job: true,
+        },
+        skip: skip,
+        take: numSize,
+      });
+
+      return data;
+    } catch (error) {
+      throw new NotFoundException('Failed to find hire jobs with pagination.');
+    }
   }
 
-  async hireJobPagination(skip: number, numSize: number): Promise<any> {
-    let data = await this.prisma.hireJob.findMany({
-      skip: skip,
-      take: numSize,
-    });
-    return data;
-  }
   async findOne(id: number): Promise<any> {
-    let data = await this.prisma.hireJob.findMany({
-      where: {
-        hire_job_id: id,
-      },
-    });
-    return data;
+    try {
+      let data = await this.prisma.hireJob.findMany({
+        where: {
+          hire_job_id: id,
+        },
+      });
+      return data;
+    } catch (error) {
+      throw new NotFoundException('Failed to find hire job.');
+    }
   }
 
   async remove(id: number): Promise<string> {
-    await this.prisma.hireJob.delete({
-      where: {
-        hire_job_id: id,
-      },
-    });
-
-    return `delete successfully! `;
+    try {
+      await this.prisma.hireJob.delete({
+        where: {
+          hire_job_id: id,
+        },
+      });
+      return 'Deleted successfully!';
+    } catch (error) {
+      throw new NotFoundException('Failed to delete hire job.');
+    }
   }
-  async completedJob(hire_job_id: number): Promise<string> {
-    let newData = { completed: true };
-    await this.prisma.hireJob.update({
-      where: {
-        hire_job_id: hire_job_id,
-      },
-      data: newData,
-    });
 
-    return `Job completed`;
+  async completedJob(hire_job_id: number): Promise<string> {
+    try {
+      let newData = { completed: true };
+      await this.prisma.hireJob.update({
+        where: {
+          hire_job_id: hire_job_id,
+        },
+        data: newData,
+      });
+      return 'Job completed';
+    } catch (error) {
+      throw new NotFoundException('Failed to mark job as completed.');
+    }
   }
 }

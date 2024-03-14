@@ -6,51 +6,78 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuards } from 'src/strategy/role.stratey';
 
-
 @ApiTags('JobType')
 @Controller('/api/job-type')
 export class JobTypeController {
   constructor(private readonly jobTypeService: JobTypeService) {}
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard("jwt")) 
+
   @Get()
-  findAll() : Promise<any> {
-    return this.jobTypeService.findAll();
+  async findAll(): Promise<any> {
+    try {
+      return await this.jobTypeService.findAll();
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
-  @UseGuards(AuthGuard("jwt"),RoleGuards) 
+  @UseGuards(AuthGuard("jwt"), RoleGuards) 
   @Post()
-  create(@Body() createJobTypeDto: CreateJobTypeDto) : Promise<string> {
-    return this.jobTypeService.create(createJobTypeDto);
+  async create(@Body() createJobTypeDto: CreateJobTypeDto): Promise<string> {
+    try {
+      return await this.jobTypeService.create(createJobTypeDto);
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt")) 
   @ApiQuery({name: "keyword", required: true, description:"filter name"})
   @ApiQuery({name: "size", required: true, description: "number item one page"})
   @ApiQuery({name: "page", required: true, description: "page number"})
   @Get('/pagination-search')
-  findwidthpage(@Query("size") size ,@Query("page") page , @Query("keyword") keyword) : Promise<any> {
-    let numPage = Number(page);
-    let numSize = Number(size);
-    let skip = (numPage - 1) * numSize;
-    return this.jobTypeService.findWidthPage(skip, numSize, keyword);
+  async findwidthpage(@Query("size") size ,@Query("page") page , @Query("keyword") keyword): Promise<any> {
+    try {
+      let numPage = Number(page);
+      let numSize = Number(size);
+      let skip = (numPage - 1) * numSize;
+      return await this.jobTypeService.findWidthPage(skip, numSize, keyword);
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard("jwt")) 
   @Get(':id')
-  findOne(@Param('id') id: string) : Promise<string> {
-    return this.jobTypeService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<string> {
+    try {
+      return await this.jobTypeService.findOne(+id);
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
-  @UseGuards(AuthGuard("jwt"),RoleGuards) 
+  @UseGuards(AuthGuard("jwt"), RoleGuards) 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateJobTypeDto: UpdateJobTypeDto) : Promise<string> {
-    return this.jobTypeService.update(+id, updateJobTypeDto);
+  async update(@Param('id') id: string, @Body() updateJobTypeDto: UpdateJobTypeDto): Promise<string> {
+    try {
+      return await this.jobTypeService.update(+id, updateJobTypeDto);
+    } catch (error) {
+      throw error;
+    }
   }
+
   @ApiBearerAuth()
-  @UseGuards(AuthGuard("jwt"),RoleGuards) 
+  @UseGuards(AuthGuard("jwt"), RoleGuards) 
   @Delete(':id')
-  remove(@Param('id') id: string) : Promise<string>{
-    return this.jobTypeService.remove(+id);
+  async remove(@Param('id') id: string): Promise<string> {
+    try {
+      return await this.jobTypeService.remove(+id);
+    } catch (error) {
+      throw error;
+    }
   }
 }
