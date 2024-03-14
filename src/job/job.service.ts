@@ -321,12 +321,53 @@ export class JobService {
       return { statusCode: 400, message: 'Not found!', content: [] };
     }
   }
-  // GET JOB BY JOB ID (NO RUN)
-  // async getJobByJobId(job_id: number): Promise<any> {
-  //   return;
-  // }
-
   // // NO RUN
-  // async getListJobByName(name_job: string): Promise<any> {}
-  // }
+  async getListJobByName(job_name: string): Promise<any> {
+    const checkJobs = await this.prisma.job.findMany({
+      where: {
+        job_name: {
+          contains: job_name,
+        },
+      },
+      include: {
+        JobDetailType: {
+          include: {
+            JobType: true,
+          },
+        },
+        Users: {
+          select: { user_name: true },
+        },
+      },
+    });
+
+    if (checkJobs.length > 0) {
+      const listJobByName = checkJobs.map((checkJob) => ({
+        job_id: checkJob.job_id,
+        congViec: {
+          job_id: checkJob.job_id,
+          job_name: checkJob.job_name,
+          rating: checkJob.rating,
+          price: checkJob.price,
+          image: checkJob.image,
+          description: checkJob.description,
+          short_description: checkJob.short_description,
+          job_rating: checkJob.job_rating,
+          detail_type_id: checkJob.detail_type_id,
+          creator_id: checkJob.creator_id,
+        },
+        detail_name: checkJob.JobDetailType.detail_name,
+        type_name: checkJob.JobDetailType.JobType.type_name,
+        user_name: checkJob.Users.user_name,
+      }));
+
+      return { statusCode: 200, message: '', content: listJobByName };
+    } else {
+      return {
+        statusCode: 404,
+        message: 'Không tìm thấy công việc.',
+        content: null,
+      };
+    }
+  }
 }

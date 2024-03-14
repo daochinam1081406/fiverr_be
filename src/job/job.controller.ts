@@ -114,7 +114,6 @@ export class JobController {
     return this.jobService.uploadJob(file.filename, +job_id, body);
   }
 
-  // GET DETAIL JOB TYPE BY ID (RUN)
   @Get('get-job-type-details/:job_type_id')
   @ApiParam({ name: 'job_type_id', type: Number })
   getDetailJobTypeById(
@@ -123,7 +122,6 @@ export class JobController {
     return this.jobService.getDetailJobTypeById(+job_type_id);
   }
 
-  // GET JOB BY DETAIL TYPE
   @Get('get-job-by-detail-type/:detail_type_id')
   @ApiParam({ name: 'detail_type_id', type: Number })
   getJobByDetailType(
@@ -132,17 +130,9 @@ export class JobController {
     return this.jobService.getJobByDetailType(detail_type_id);
   }
 
-  // GET JOB BY JOB ID
-  // @Get('get-job-by-job-id/:job_id')
-  // @ApiParam({ name: 'job_id', type: Number })
-  // getJobByJobId(@Param('job_id') job_id: number) {
-  //   return this.jobService.getJobByJobId(+job_id);
-  // }
-
-  // GET LIST JOB BY NAME
-  // @Get('get-list-job/:name_job')
-  // @ApiParam({ name: 'name_job', type: String })
-  // getListJobByName(name_job: string): Promise<any> {
-  //   return this.jobService.getListJobByName(name_job);
-  // }
+  @Get('get-list-job/:job_name')
+  @ApiParam({ name: 'job_name', type: String })
+  getListJobByName(job_name: string): Promise<any> {
+    return this.jobService.getListJobByName(job_name);
+  }
 }
