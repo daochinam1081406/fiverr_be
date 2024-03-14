@@ -8,7 +8,6 @@ import { CommentEntity } from './entities/comment.entity';
 export class CommentService {
   prisma = new PrismaClient();
 
-  // GET COMMENT
   async getComment(): Promise<CommentResponse> {
     try {
       const data: CommentEntity[] = await this.prisma.comments.findMany();
@@ -28,7 +27,7 @@ export class CommentService {
       );
     }
   }
-  // POST COMMENT
+
   async postComment(body: CommentsDTO): Promise<CommentResponse> {
     try {
       const { job_id, commenter_id, content, comment_rating } = body;
@@ -72,7 +71,6 @@ export class CommentService {
     }
   }
 
-  // PUT COMMENT
   async putCommentById(
     comment_id: number,
     body: CommentsDTO,
@@ -129,7 +127,6 @@ export class CommentService {
     }
   }
 
-  // DELETE COMMENT
   async deleteComment(comment_id: number): Promise<any> {
     try {
       const checkCommentDB = await this.prisma.comments.findUnique({
@@ -159,7 +156,6 @@ export class CommentService {
     }
   }
 
-  // GET COMMENT BY JOB
   async getCommentByJob(job_id: number): Promise<any> {
     try {
       const comments = await this.prisma.comments.findMany({

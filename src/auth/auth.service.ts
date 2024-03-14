@@ -12,7 +12,6 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   prisma = new PrismaClient();
-  // LOGIN
   async login(body: AuthLoginDTO): Promise<any> {
     try {
       let { email, pass_word } = body;
@@ -21,12 +20,10 @@ export class AuthService {
           email: email,
         },
       });
-      
+
       if (checkEmail) {
-        
         let isCorrectPass = bcrypt.compareSync(pass_word, checkEmail.pass_word);
         if (isCorrectPass) {
-       
           let payload = {
             user_id: checkEmail.user_id,
             email: checkEmail.email,
@@ -36,7 +33,7 @@ export class AuthService {
             secret: this.configService.get('SECRET_KEY'),
             expiresIn: this.configService.get('EXPIRES_IN'),
           });
-         
+
           return {
             status: 200,
             message: 'Login successfully!',
@@ -55,7 +52,7 @@ export class AuthService {
         };
       }
     } catch (error) {
-      console.log(error +"123");
+      console.log(error + '123');
       return {
         status: 500,
         message: error,
@@ -63,11 +60,8 @@ export class AuthService {
     }
   }
 
-  // SIGN-UP
-  
   async signUp(body: AuthSignUpDTO): Promise<any> {
     try {
-   
       const {
         user_name,
         avatar,
@@ -95,7 +89,7 @@ export class AuthService {
           pass_word: encodePass,
         };
 
-         await this.prisma.users.create({ data: newUser });
+        await this.prisma.users.create({ data: newUser });
         return { status: 201, message: 'User signed up successfully!' };
       }
     } catch (error) {

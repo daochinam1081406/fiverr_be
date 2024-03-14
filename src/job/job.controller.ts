@@ -3,16 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
   Put,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { JobService } from './job.service';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiParam,
@@ -23,6 +24,7 @@ import { JobDTO } from './dto/job.dto';
 import { JobResponse, JobTypeResponse } from './entities/job.response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Job')
 @Controller('api/job')
@@ -35,6 +37,8 @@ export class JobController {
   }
 
   @Post('')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiBody({ type: JobDTO })
   async postJob(@Body() body: JobDTO): Promise<JobResponse> {
     return this.jobService.postJob(body);
@@ -57,31 +61,33 @@ export class JobController {
     return this.jobService.getMenuJobType();
   }
 
-  // GET JOB BY ID (RUN)
   @Get('/:job_id')
   @ApiParam({ name: 'job_id', type: Number })
   getJobById(@Param('job_id') job_id: number): Promise<any> {
     return this.jobService.getJobById(+job_id);
   }
 
-  // PUT JOB BY ID
   @Put(':job_id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'job_id', type: Number })
   @ApiBody({ type: JobDTO })
   putJob(@Param('job_id') job_id: number, @Body() body: JobDTO) {
     return this.jobService.putJob(+job_id, body);
   }
 
-  // DELETE JOB BY ID
   @Delete(':job_id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @ApiParam({ name: 'job_id', type: Number })
   async deleteJob(@Query('job_id') job_id: number): Promise<any> {
     return this.jobService.deleteJob(+job_id);
   }
 
-  // POST UPLOAD IMAGE JOB BY ID
-  @ApiParam({ name: 'job_id', required: true })
   @Post('/upload-job-image/:job_id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiParam({ name: 'job_id', required: true })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Upload a file',

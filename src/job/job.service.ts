@@ -171,7 +171,6 @@ export class JobService {
     }
   }
 
-  // NO RUN
   async deleteJob(job_id: number): Promise<any> {
     const jobDB = await this.prisma.comments.findFirst({
       where: {
@@ -277,7 +276,7 @@ export class JobService {
       );
     }
   }
-  // GET JOB BY DETAIL TYPE
+
   async getJobByDetailType(detail_type_id: number): Promise<any> {
     const checkIdDB = this.prisma.job.findFirst({
       where: {
@@ -321,7 +320,7 @@ export class JobService {
       return { statusCode: 400, message: 'Not found!', content: [] };
     }
   }
-  // // NO RUN
+
   async getListJobByName(job_name: string): Promise<any> {
     const checkJobs = await this.prisma.job.findMany({
       where: {
