@@ -1,0 +1,380 @@
+{
+	"info": {
+		"_postman_id": "e1887923-607a-46fe-b250-45b76aab91e6",
+		"name": "API Controllers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "26705883"
+	},
+	"item": [
+		{
+			"name": "JobType API",
+			"item": [
+				{
+					"name": "Get All Job Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089/api/job-type"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Job Type",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6Im5hbWRhbzJAZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzEwNDMzNTM1LCJleHAiOjE4MDUxMDYzMzV9.XiUiXqQI9_bQyhZ_yu98g8zDz5cZF2LtCFPEc8kAPHA"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type_name\": \"EDIT VIDEO\"\n}"
+						},
+						"url": "http://localhost:8089/api/job-type"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Job Types",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6Im5hbWRhbzJAZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzEwNDMzNTM1LCJleHAiOjE4MDUxMDYzMzV9.XiUiXqQI9_bQyhZ_yu98g8zDz5cZF2LtCFPEc8kAPHA"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089/api/job-type/pagination-search?size=10&page=1&keyword=D",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8089",
+							"path": [
+								"api",
+								"job-type",
+								"pagination-search"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "keyword",
+									"value": "D"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Job Type by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089//api/job-type/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Job Type",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propertyName\": \"propertyValue\"\n}"
+						},
+						"url": "http://localhost:8089//api/job-type/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Job Type",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8089//api/job-type/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "JobTypeDetail API",
+			"item": [
+				{
+					"name": "Get All Job Type Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089//api/job-type-detail"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Job Type Detail",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propertyName\": \"propertyValue\"\n}"
+						},
+						"url": "http://localhost:8089//api/job-type-detail"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Job Type Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089//api/job-type-detail/pagination-search?size=10&page=1&keyword=Example",
+							"host": [
+								"http://localhost:8089/"
+							],
+							"path": [
+								"api",
+								"job-type-detail",
+								"pagination-search"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "keyword",
+									"value": "Example"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Job Type Detail by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089//api/job-type-detail/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Job Type Detail",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propertyName\": \"propertyValue\"\n}"
+						},
+						"url": "http://localhost:8089//api/job-type-detail/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Job Type Detail",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8089//api/job-type-detail/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "HireJob API",
+			"item": [
+				{
+					"name": "Get All Hire Jobs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089//api/hire-job"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Hire Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propertyName\": \"propertyValue\"\n}"
+						},
+						"url": "http://localhost:8089//api/hire-job/create-hire-job"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Hire Jobs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8089//api/hire-job/pagination-search?size=10&page=1&keyword=Example",
+							"host": [
+								"http://localhost:8089/"
+							],
+							"path": [
+								"api",
+								"hire-job",
+								"pagination-search"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "keyword",
+									"value": "Example"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hire Job by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089//api/hire-job/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hire Jobs by User ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8089//api/hire-job/get-hire-job-by-user/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Hire Job",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propertyName\": \"propertyValue\"\n}"
+						},
+						"url": "http://localhost:8089//api/hire-job/update-hire-job/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Hire Job",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8089//api/hire-job/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Hire Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propertyName\": \"propertyValue\"\n}"
+						},
+						"url": "http://localhost:8089//api/hire-job/completed-job/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AUTH",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"namdao2@gmail.com\",\n  \"pass_word\": \"namdao\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8089/auth/login"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
