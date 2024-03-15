@@ -1,10 +1,8 @@
-import { HttpException, HttpStatus, Injectable, Query } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { JobDTO } from './dto/job.dto';
-import { ApiParam } from '@nestjs/swagger';
-import { JobResponse, JobTypeResponse } from './entities/job.response';
+import { JobResponse } from './entities/job.response';
 import { JobEntity } from './entities/job.entity';
-
 @Injectable()
 export class JobService {
   private prisma = new PrismaClient();
@@ -173,7 +171,6 @@ export class JobService {
     }
   }
 
-  // NO RUN
   async deleteJob(job_id: number): Promise<any> {
     const jobDB = await this.prisma.comments.findFirst({
       where: {
@@ -196,8 +193,21 @@ export class JobService {
     }
   }
 
-  // // POST UPLOAD IMAGE JOB BY ID
-  // async uploadImageJob() {}
+  async uploadJob(
+    filename: string,
+    job_id: number,
+    body: JobDTO,
+  ): Promise<any> {
+    let upload = { ...body };
+    upload.image = filename;
+    await this.prisma.job.update({
+      where: {
+        job_id: job_id,
+      },
+      data: upload,
+    });
+    return `Upload Image success !`;
+  }
 
   async getMenuJobType(): Promise<any> {
     try {
@@ -266,23 +276,97 @@ export class JobService {
       );
     }
   }
-  // GET JOB BY JOB TYPE ID (NO RUN)
-  async getJobByJobTypeId(job_detail_type_id: number): Promise<any> {
-    const jobDetailTypeIdDB = await this.prisma.jobType.findFirst({
-      where: {},
+
+  async getJobByDetailType(detail_type_id: number): Promise<any> {
+    const checkIdDB = this.prisma.job.findFirst({
+      where: {
+        detail_type_id: Number(detail_type_id),
+      },
     });
-    if (jobDetailTypeIdDB) {
-      const data = await this.prisma.jobDetailType.findMany({
-        where: { job_detail_type_id },
+    if (checkIdDB) {
+      const listJob = await this.prisma.job.findMany({
+        where: {
+          detail_type_id: Number(detail_type_id),
+        },
+        include: {
+          JobDetailType: {
+            include: { JobType: true },
+          },
+          Users: {
+            select: { user_name: true },
+          },
+        },
       });
+      const data = listJob.map((item) => ({
+        detail_type_id: item.detail_type_id,
+        job: {
+          job_id: item.job_id,
+          job_name: item.job_name,
+          rating: item.rating,
+          price: item.price,
+          image: item.image,
+          description: item.description,
+          short_description: item.short_description,
+          job_rating: item.job_rating,
+          detail_type_id: item.detail_type_id,
+          creator_id: item.creator_id,
+        },
+        detail_name: item.JobDetailType.detail_name,
+        type_name: item.JobDetailType.JobType.type_name,
+        user_name: item.Users.user_name,
+      }));
+      return { statusCode: 200, message: 'Get success!', content: data };
+    } else {
+      return { statusCode: 400, message: 'Not found!', content: [] };
     }
   }
 
-  // GET JOB BY JOB ID (NO RUN)
-  async getJobByJobId(job_id: number): Promise<any> {
-    return;
-  }
+  async getListJobByName(job_name: string): Promise<any> {
+    const checkJobs = await this.prisma.job.findMany({
+      where: {
+        job_name: {
+          contains: job_name,
+        },
+      },
+      include: {
+        JobDetailType: {
+          include: {
+            JobType: true,
+          },
+        },
+        Users: {
+          select: { user_name: true },
+        },
+      },
+    });
 
-  // NO RUN
-  async getListJobByName(name_job: string): Promise<any> {}
+    if (checkJobs.length > 0) {
+      const listJobByName = checkJobs.map((checkJob) => ({
+        job_id: checkJob.job_id,
+        congViec: {
+          job_id: checkJob.job_id,
+          job_name: checkJob.job_name,
+          rating: checkJob.rating,
+          price: checkJob.price,
+          image: checkJob.image,
+          description: checkJob.description,
+          short_description: checkJob.short_description,
+          job_rating: checkJob.job_rating,
+          detail_type_id: checkJob.detail_type_id,
+          creator_id: checkJob.creator_id,
+        },
+        detail_name: checkJob.JobDetailType.detail_name,
+        type_name: checkJob.JobDetailType.JobType.type_name,
+        user_name: checkJob.Users.user_name,
+      }));
+
+      return { statusCode: 200, message: '', content: listJobByName };
+    } else {
+      return {
+        statusCode: 404,
+        message: 'Không tìm thấy công việc.',
+        content: null,
+      };
+    }
+  }
 }

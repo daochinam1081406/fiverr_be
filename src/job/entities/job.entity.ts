@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-
+import { PrismaClient } from '@prisma/client';
 @Entity()
 export class JobEntity {
   @PrimaryGeneratedColumn()

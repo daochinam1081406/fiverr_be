@@ -6,15 +6,14 @@ export class JobResponse {
   message: string;
 }
 
+export class JobDetailTypeResponse {
+  statusCode: number;
+  content: JobDetailTypeEntity[];
+  message: string;
+}
 export class JobTypeResponse {
   statusCode: number;
   // content: JobTypeEntity[];
   content: (JobTypeEntity & { JobDetailType: JobDetailTypeEntity[] })[];
-  message: string;
-}
-
-export class JobDetailTypeResponse {
-  statusCode: number;
-  content: JobDetailTypeEntity[];
   message: string;
 }

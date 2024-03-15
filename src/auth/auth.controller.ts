@@ -16,8 +16,6 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  // LOGIN
   @Post('/login')
   @ApiBody({ type: AuthLoginDTO })
   async login(@Body() body: AuthLoginDTO, @Res() response): Promise<any> {
@@ -25,7 +23,6 @@ export class AuthController {
     response.status(data.status).json(data);
   }
 
-  // SIGN-UP
   @ApiBody({ type: AuthSignUpDTO })
   @Post('/sign-up')
   async signUp(@Body() body: AuthSignUpDTO, @Res() response): Promise<any> {

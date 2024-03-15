@@ -3,12 +3,12 @@ import { PrismaClient } from '@prisma/client';
 import { UserDTO } from './dto/user.dto';
 import { UserResponse } from './entities/user.response';
 import { UserEntity } from './entities/user.entity';
-
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 @Injectable()
 export class UserService {
   private prisma = new PrismaClient();
 
-  constructor() {
+  constructor(private readonly cloudinaryService: CloudinaryService) {
     this.prisma = new PrismaClient();
   }
 
@@ -28,7 +28,6 @@ export class UserService {
     }
   }
 
-  // POST USER
   async postUser(body: UserDTO): Promise<UserResponse> {
     try {
       const {
@@ -83,7 +82,6 @@ export class UserService {
     }
   }
 
-  // DELETE USER
   async deleteUser(user_id: number): Promise<any> {
     try {
       const checkUserDB = await this.prisma.users.findUnique({
@@ -113,7 +111,6 @@ export class UserService {
     }
   }
 
-  // PAGINATION PAGE AND SEARCH USER
   async paginationSearchUser(
     pageIndex: number,
     pageSize: number,
@@ -151,7 +148,6 @@ export class UserService {
     }
   }
 
-  // GET USER BY ID
   async getUserById(user_id: number): Promise<UserResponse> {
     try {
       const user = await this.prisma.users.findFirst({
@@ -180,7 +176,6 @@ export class UserService {
     }
   }
 
-  // PUT USER BY ID
   async putUserById(user_id: number, body: UserDTO): Promise<UserResponse> {
     try {
       const user = await this.prisma.users.findFirst({
@@ -227,7 +222,6 @@ export class UserService {
     }
   }
 
-  // SEARCH USER BY NAME
   async getSearchUserByName(user_name: string): Promise<UserResponse> {
     try {
       const data = await this.prisma.users.findMany({
@@ -249,6 +243,19 @@ export class UserService {
     }
   }
 
-  // UPLOAD AVATAR
-  async uploadAvatar() {}
+  async uploadAvatar(
+    filename: string,
+    user_id: number,
+    body: UserDTO,
+  ): Promise<any> {
+    let upload = { ...body };
+    upload.avatar = filename;
+    await this.prisma.users.update({
+      where: {
+        user_id: user_id,
+      },
+      data: upload,
+    });
+    return `Upload Image success !`;
+  }
 }
