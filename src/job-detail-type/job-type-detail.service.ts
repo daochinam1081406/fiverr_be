@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class JobTypeDetailService {
-  prisma = new PrismaClient();
+  prisma = new PrismaClient()
 
   async findAll(): Promise<any> {
     try {
@@ -16,43 +16,35 @@ export class JobTypeDetailService {
     }
   }
 
-  async create(
-    createJobTypeDetailDto: CreateJobTypeDetailDto,
-  ): Promise<string> {
+  async create(createJobTypeDetailDto: CreateJobTypeDetailDto): Promise<string> {
     try {
       let newTypeDetail = { ...createJobTypeDetailDto };
       await this.prisma.jobDetailType.create({
-        data: newTypeDetail,
+        data: newTypeDetail
       });
-      return ' Created Success';
+      return `Created Success`;
     } catch (error) {
       throw new NotFoundException('Failed to create job detail type.');
     }
   }
 
-  async findWidthPage(
-    skip: number,
-    numSize: number,
-    keyword: string,
-  ): Promise<any> {
+  async findWidthPage(skip: number, numSize: number, keyword: string): Promise<any> {
     try {
       if (isNaN(skip) || isNaN(numSize) || !keyword) {
-        return { error: 'Please input param' };
+          return { error: 'Please input param' };
       }
       let data = await this.prisma.jobDetailType.findMany({
-        where: {
-          detail_name: {
-            contains: keyword,
+          where: {
+              detail_name: {
+                  contains: keyword
+              }
           },
-        },
-        skip: skip,
-        take: numSize,
+          skip: skip,
+          take: numSize,
       });
       return data;
     } catch (error) {
-      throw new NotFoundException(
-        'Failed to find job detail types with pagination.',
-      );
+      throw new NotFoundException('Failed to find job detail types with pagination.');
     }
   }
 
@@ -60,8 +52,8 @@ export class JobTypeDetailService {
     try {
       let data = await this.prisma.jobDetailType.findMany({
         where: {
-          job_detail_type_id: job_detail_type_id,
-        },
+          job_detail_type_id: job_detail_type_id
+        }
       });
       return data;
     } catch (error) {
@@ -69,41 +61,32 @@ export class JobTypeDetailService {
     }
   }
 
-  async upload(
-    filename: string,
-    job_detail_type_id: number,
-    updateJobTypeDetailDto: UpdateJobTypeDetailDto,
-  ): Promise<string> {
+  async upload(filename: string, job_detail_type_id: number, updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<string> {
     try {
       let upload = { ...updateJobTypeDetailDto };
       upload.image = filename;
       await this.prisma.jobDetailType.update({
         where: {
-          job_detail_type_id: job_detail_type_id,
+          job_detail_type_id: job_detail_type_id
         },
-        data: upload,
+        data: upload
       });
-      return 'Upload Image success'!;
+      return `Upload Image success !`;
     } catch (error) {
-      throw new NotFoundException(
-        'Failed to upload image for job detail type.',
-      );
+      throw new NotFoundException('Failed to upload image for job detail type.');
     }
   }
 
-  async update(
-    job_detail_type_id: number,
-    updateJobTypeDetailDto: UpdateJobTypeDetailDto,
-  ): Promise<string> {
+  async update(job_detail_type_id: number, updateJobTypeDetailDto: UpdateJobTypeDetailDto): Promise<string> {
     try {
       let updateTypeDetail = { ...updateJobTypeDetailDto };
       await this.prisma.jobDetailType.update({
         where: {
-          job_detail_type_id: job_detail_type_id,
+          job_detail_type_id: job_detail_type_id
         },
-        data: updateTypeDetail,
+        data: updateTypeDetail
       });
-      return 'update success!';
+      return `update success!`;
     } catch (error) {
       throw new NotFoundException('Failed to update job detail type.');
     }
@@ -113,10 +96,10 @@ export class JobTypeDetailService {
     try {
       await this.prisma.jobDetailType.delete({
         where: {
-          job_detail_type_id: job_detail_type_id,
-        },
+          job_detail_type_id: job_detail_type_id
+        }
       });
-      return 'delete  suscessfull!';
+      return `delete  suscessfull! `;
     } catch (error) {
       throw new NotFoundException('Failed to delete job detail type.');
     }
