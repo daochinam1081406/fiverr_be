@@ -50,7 +50,7 @@ export class AuthSignUpDTO {
 
   @ApiProperty({
     description: 'birth_day',
-    type: String,
+    type: String, default: new Date().toISOString()
   })
   birth_day: string;
 
